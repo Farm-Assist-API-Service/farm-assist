@@ -1,0 +1,9 @@
+{
+  "name": "farm-assist",
+  "version": "0.1",
+  "description": "This is a REST API service for Farm Assist application. It is an agricultural data collition and a marketplace software.",
+  "main": "index.js",
+  "repository": "https://github.com/godsgiftuko/farm-assist",
+  "author": "Uko, God'sgift Matthew",
+  "license": "MIT"
+}

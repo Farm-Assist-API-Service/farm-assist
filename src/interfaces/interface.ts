@@ -1,3 +1,5 @@
+import { Request, Response, Application, NextFunction, IRouter } from "express";
+
 // Generic
 export type PO = Promise<{}>;
 export type PA = Promise<[]>;
@@ -12,10 +14,11 @@ export type AB = Array<boolean>;
 export type MA = Array<any>;
 
 // Http
-export type Response = object;
-export type Request = object;
-export type Next = object;
-export type Route = object;
+export type Res = Response;
+export type Req = Request;
+export type Next = NextFunction;
+export type Router = IRouter;
+export type App = Application;
 
 // FsOpertaion Interface
 export interface IFSOperation {

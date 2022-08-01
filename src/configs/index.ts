@@ -1,5 +1,7 @@
 // Exports software configurations
-
+import path from "path";
+import { config } from "dotenv";
+config({ path: path.resolve(__dirname, '../.env') });
 // MongoDB configuration
 export const mongoDBVARIABLES = {}
 
@@ -7,10 +9,16 @@ export const mongoDBVARIABLES = {}
 export const web3VARIABLES = {}
 
 // App configuration
-export const appVARIABLES = {}
+export const APP_VAR: {
+    serverPort: number;
+    allowedURL: Array<string>;
+    databaseURI: any; 
+} = {
+    serverPort: 3000,
+    allowedURL: [''],
+    databaseURI: process.env.DATABASE_URI
+}
 
+console.log(APP_VAR)
 
-// Exports all dependencies this software requires;
-
-// export { default as Fs } from 'fs';
-// export { default as Http } from 'http';
+// 

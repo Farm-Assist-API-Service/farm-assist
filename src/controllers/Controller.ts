@@ -1,25 +1,25 @@
-import { IController, Request, Response, Next } from "../interfaces";
+import { IController, Req, Res, Next } from "../interfaces";
 // Controller Instance
 
 abstract class Controller implements IController {
 
-    callCreateModel(req: Request, res: Response, next: Next): void {
+    callCreateModel(req: Req, res: Res, next: Next): void {
         
     }
 
-    callUpdateModel(req: Request, res: Response, next: Next): void {
+    callUpdateModel(req: Req, res: Res, next: Next): void {
         
     }
 
-    callDeleteModel(req: Request, res: Response, next: Next): void {
+    callDeleteModel(req: Req, res: Res, next: Next): void {
         
     }
 
-    callGetModel(req: Request, res: Response, next: Next): void {
+    callGetModel(req: Req, res: Res, next: Next): void {
         
     }
 
-    callGetAllModel(req: Request, res: Response, next: Next): void {
+    callGetAllModel(req: Req, res: Res, next: Next): void {
         
     }
 

@@ -1,5 +1,7 @@
-import { Next, Request, Response, Route } from "../interfaces";
+import { Router } from "../interfaces";
 
-export default function<Route>(req: Request, res: Response, next: Next) {
-    
+export default function(router: Router) {
+    router
+    // .get()
+    return router;
 }

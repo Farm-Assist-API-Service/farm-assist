@@ -1,5 +1,5 @@
-import { Next, Request, Response, Route } from "../interfaces";
+import { Next, Req, Res } from "../interfaces";
 
-export default function <Route>(req: Request, res: Response, next: Next) {
+export default function(req: Req, res: Res, next: Next) {
     
 }

@@ -1,13 +1,13 @@
 import Controller from './Controller';
 import { UserModel } from '../models';
-import { Request, Response, Next } from '../interfaces';
+import { Req, Res, Next } from '../interfaces';
 
 const user = new UserModel();
 
 // User controllers
 class UserController extends Controller {
 
-    callCreateModel(req: Request, res: Response, next: Next): void {
+    callCreateModel(req: Req, res: Res, next: Next): void {
         try {
             const promise = user.create({});
         } catch(error) {
@@ -15,7 +15,7 @@ class UserController extends Controller {
         }
     }
 
-    callUpdateModel(req: Request, res: Response, next: Next): void {
+    callUpdateModel(req: Req, res: Res, next: Next): void {
         try {
             const promise = user.update({});
         } catch(error) {
@@ -23,7 +23,7 @@ class UserController extends Controller {
         }
     }
 
-    callGetModel(req: Request, res: Response, next: Next): void {
+    callGetModel(req: Req, res: Res, next: Next): void {
         try {
             const promise = user.get('');
         } catch(error) {
@@ -31,7 +31,7 @@ class UserController extends Controller {
         }
     }
 
-    callGetAllModel(req: Request, res: Response, next: Next): void {
+    callGetAllModel(req: Req, res: Res, next: Next): void {
         try {
             const promise = user.getAll;
         } catch(error) {
@@ -39,7 +39,7 @@ class UserController extends Controller {
         }
     }
 
-    callDeleteModel(req: Request, res: Response, next: Next): void {
+    callDeleteModel(req: Req, res: Res, next: Next): void {
         try {
             const promise = user.delete('');
         } catch(error) {
@@ -47,7 +47,7 @@ class UserController extends Controller {
         }
     }
 
-    callEmailVerification(req: Request, res: Response, next: Next): void {
+    callEmailVerification(req: Req, res: Res, next: Next): void {
         try {
             const promise = user.delete('');
         } catch(error) {

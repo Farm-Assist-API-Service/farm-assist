@@ -1,13 +1,22 @@
-export enum EHttpStatus {
+export enum EProtocolStatusCode {
     ok = 200,
     created = 201,
     deleted = 301,
 }
 
-export enum EHttpMessages {
+export enum EProtocolMessages {
     ok = 'Success!',
     created = 'Created!',
     deleted = 'Deleted!',
     updated = 'Updated!',
     failed = 'Failed!',
+}
+
+export enum EProtocol {
+    http = "HTTP",
+    websocket = "WEB SOCKET",
+}
+
+export enum EcontentType {
+    josn = 'application/json'
 }

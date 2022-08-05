@@ -1,9 +1,15 @@
-// Exports software configurations
 import path from "path";
 import { config } from "dotenv";
+
 config({ path: path.resolve(__dirname, '../.env') });
+
+
 // MongoDB configuration
-export const mongoDBVARIABLES = {}
+export const databases: {
+    mongoURI: string | undefined;
+} = {
+    mongoURI: process.env.MONGO_DATABASE_REMOTE_URI || process.env.MONGO_DATABASE_LOCAL_URI
+}
 
 // Web3 configuration
 export const web3VARIABLES = {}
@@ -11,14 +17,16 @@ export const web3VARIABLES = {}
 // App configuration
 export const APP_VAR: {
     serverPort: number;
-    allowedURL: Array<string>;
-    databaseURI: any; 
+    allowedOrigins: Array<string>;
+    httpMethods: Array<string>;
+    tokenSecret: string;
+    tokenExpiry: number;
 } = {
-    serverPort: 3000,
-    allowedURL: [''],
-    databaseURI: process.env.DATABASE_URI
+    serverPort: Number(process.env.SERVER_PORT) || 7000,
+    allowedOrigins: ['http://localhost:3000'],
+    httpMethods: ["GET","POST"],
+    tokenSecret: process.env.JWT_TOKEN_SECRET as string,
+    tokenExpiry: Number(process.env.JWT_TOKEN_EXPIRY)
 }
-
-console.log(APP_VAR)
 
 // 

@@ -1,4 +1,4 @@
-import { Request, Response, Application, NextFunction, IRouter } from "express";
+import { Request, Response, Application, NextFunction, IRouter, ErrorRequestHandler, IRoute } from "express";
 
 // Generic
 export type PO = Promise<{}>;
@@ -18,15 +18,45 @@ export type Res = Response;
 export type Req = Request;
 export type Next = NextFunction;
 export type Router = IRouter;
+export type Route = IRoute;
 export type App = Application;
+export type HttpErr = ErrorRequestHandler
 
-// FsOpertaion Interface
-export interface IFSOperation {
-    readFile(props: Array<string>): Array<object>;
-    writeFile(oject: object): Promise<string>;
+export type HttpHeader = {
+  contentType?: string;
+  referrer?: string;
+  userAgent?: string;
+} 
+
+export type HttpRequest = {
+    body: object;
+    query: object;
+    params: object;
+    ip: string;
+    method: string;
+    path: string;
+    headers: HttpHeader;
 }
 
-// Model Interface
+export type HttpResponse = {
+  headers: HttpHeader;
+  body: object;
+  statusCode: number;
+}
+
+export type Usecase = {
+    addEntity: Function;
+    removeEntity: Function;
+    modifiyEntity: Function;
+    getEntity: Function;
+}
+
+export interface IError {
+    message: string;
+    name: string;
+    stack?: string;
+}
+
 export interface IModel {
     create(user: object): PO;
     update(field: object): PO;
@@ -35,16 +65,65 @@ export interface IModel {
     get getAll(): PA;
 }
 
-// Controller Interface
 export interface IController {
-    callCreateModel(req: object, res: object, next: object): void;
-    callUpdateModel(req: object, res: object, next: object): void;
-    callDeleteModel(req: object, res: object, next: object): void;
-    callGetModel(req: object, res: object, next: object): void;
-    callGetAllModel(req: object, res: object, next: object): void;
+    registerEntity(req: object, res: object, next: object): void;
 }
 
-// Person Interface
+export interface IDatabase {
+    findOne(query: string): PO;
+    findAll(): PA;
+}
+
+export interface IDBDriver {
+    name: string;
+    URI: string;
+    createConnection(database?: IDatabase): PO;
+}
+
+export interface IServerConfig {
+    name: string;
+    httpDriver: HttpDriver;
+    wssDriver: Function;
+    // allowedOrigins: AS;
+    // allowedMethod: AS;
+}
+
+export interface IRouterMethods {
+    get: Function;
+    post: Function;
+    put: Function;
+    delete: Function;
+    patch: Function;
+}
+
+export interface Iserver extends IServerConfig {
+    allowedOrigins: AS;
+    allowedMethod: AS;
+    initiate(port: number): object;
+    middleware(url: string): void;
+    route(route: string): IRouterMethods;
+}
+
+export type HttpDriver = {
+    default: any;
+    set: any;
+    router: Router;
+    middleware: any;
+    adapter: Function;
+}
+
+export type TMain = {
+    port: number;
+    database: IDatabase;
+}
+
+export interface IMain extends TMain {
+    startServer(server: Iserver): any;
+}
+
+
+
+
 export interface IPerson {
     id: string; //  For mongoose use Object.id() type annotation
     firstName: string; 

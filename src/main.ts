@@ -1,18 +1,18 @@
-import { createServer } from "http";
 import express from "express";
 import cors from "cors";
-import { Req, Res, App, Next, Router } from "./src/interfaces";
-import { userRoute } from "./src/routes";
-import middlewares from "./src/middlewares";
-import { APP_VAR } from "./src/configs";
-import { webSocket } from "./src/utils";
+import { createServer } from "http";
+import { Req, Res, App, Next, Router, IDatabase, IMain, Iserver, TMain } from "./interfaces";
+import { userRoute } from "./routes";
+import { headerControl } from "./middlewares";
+import { APP_VAR } from "./configs";
+import { webSocket } from "./utils";
 
-const httpServer = () => {
+export default function main() {
     const PORT = APP_VAR.serverPort;
     const app: App = express();
     const router: Router = express.Router();
     const corsOption = {
-        origin: APP_VAR.allowedURL,
+        origin: APP_VAR.allowedOrigins,
     };
     
     app.use(express.urlencoded({ extended: true }));
@@ -25,11 +25,10 @@ const httpServer = () => {
     // API STATUS CHECK
     app.get("/ping", (req: Req, res: Res, next: Next) => res.status(200).json({ message: "Pong!" }));
     
-    app.use(middlewares(PORT));
+    app.use(headerControl(PORT));
     // ROUTES
     app.use("/api", userRoute(router));
     
     const httpServer = createServer(app).listen(PORT, () => console.log(`Server running on Port: ${PORT}`));
     webSocket(httpServer);
 };
-httpServer();

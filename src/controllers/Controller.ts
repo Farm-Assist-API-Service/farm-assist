@@ -1,28 +1,62 @@
-import { IController, Req, Res, Next } from "../interfaces";
+import { Usecase, EcontentType, HttpResponse, HttpRequest } from "../interfaces";
 // Controller Instance
 
-abstract class Controller implements IController {
-
-    callCreateModel(req: Req, res: Res, next: Next): void {
-        
+type PHttpResponse = Promise<HttpResponse>;
+export default class Controllers {
+    public addEntity: Function;
+    public removeEntity: Function;
+    public modifiyEntity: Function;
+    public getEntity: Function;
+    constructor(usecase: Usecase) {
+        this.addEntity = usecase.addEntity;
+        this.removeEntity = usecase.removeEntity;
+        this.modifiyEntity = usecase.modifiyEntity;
+        this.getEntity = usecase.getEntity;
     }
+    
+    async registerEntity (httpRequest: HttpRequest): PHttpResponse {
+        try {
 
-    callUpdateModel(req: Req, res: Res, next: Next): void {
-        
-    }
+            const source: {
+                ip: string;
+                browser: string | undefined;
+                referrer?: string;
+            } = {
+                ip: httpRequest.ip,
+                browser: httpRequest.headers.userAgent
+            }
 
-    callDeleteModel(req: Req, res: Res, next: Next): void {
-        
-    }
+            const entityInfo = httpRequest.body
+            
+            if (httpRequest.headers.referrer) {
+                source.referrer = httpRequest.headers.referrer
+            }
+            const posted = await this.addEntity({
+                ...entityInfo,
+                source
+            });
+            return {
+                headers: {
+                    contentType: EcontentType.josn,
+                },
+                statusCode: 201,
+                body: { posted }
+            }
+            } catch (e: any) {
+            // TODO: Error logging
+            console.log(e)
 
-    callGetModel(req: Req, res: Res, next: Next): void {
-        
-    }
-
-    callGetAllModel(req: Req, res: Res, next: Next): void {
-        
+            return {
+                headers: {
+                    contentType: EcontentType.josn
+                },
+                statusCode: 400,
+                body: {
+                    error: e.message
+                }
+            }
+        }
     }
 
 }
 
-export default Controller;

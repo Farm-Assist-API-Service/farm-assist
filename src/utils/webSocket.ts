@@ -4,7 +4,7 @@ import { APP_VAR } from '../configs';
 export default function webSocket(httpServer: any) {
     const socket = new Server(httpServer, {
         cors: {
-            origin: APP_VAR.allowedURL[0],
+            origin: APP_VAR.allowedOrigins[0],
             methods: ['GET', 'POST']
         }
     });

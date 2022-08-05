@@ -1,9 +1,13 @@
 import { IModel, PA, PO } from '../interfaces';
+import { RequiredParameterError, InvalidPropertyError } from '../helpers/errors';
 
 abstract class Model implements IModel {
 
     create(entity: object): PO {
-        return Promise.resolve({});
+        return new Promise((resolve, reject) => {
+            const newEntity = Object.freeze(entity);
+            resolve(newEntity);
+        });
     }
 
     update(field: object): PO {

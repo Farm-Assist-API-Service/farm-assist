@@ -22,6 +22,12 @@ export type Route = IRoute;
 export type App = Application;
 export type HttpErr = ErrorRequestHandler
 
+export type sourceInfo = {
+    ip: string;
+    userAgent?: string;
+    referrer?: string;
+}
+
 export type HttpHeader = {
   contentType?: string;
   referrer?: string;
@@ -29,7 +35,7 @@ export type HttpHeader = {
 } 
 
 export type HttpRequest = {
-    body: object;
+    body: any;
     query: object;
     params: object;
     ip: string;
@@ -58,11 +64,8 @@ export interface IError {
 }
 
 export interface IModel {
-    create(user: object): PO;
-    update(field: object): PO;
-    delete(userID: string): PO;
-    get(userID: string): PO;
-    get getAll(): PA;
+    get Rules(): any;
+    create(entity: any): any;
 }
 
 export interface IController {
@@ -121,20 +124,42 @@ export interface IMain extends TMain {
     startServer(server: Iserver): any;
 }
 
+export interface IDB {
+  findByEmail(field: { email: string}): Promise<User | null>;
+  insert(data: User): void
+}
+
+export enum EdataType {
+    string = 'string',
+    number = 'number',
+    mixed = 'mixed characters'
+}
+
+export type Field = {
+    required: boolean;
+    minLen: null | number;
+    maxLen?: number;
+    dataType: EdataType.string | EdataType.number | EdataType.mixed;
+}
 
 
-
-export interface IPerson {
-    id: string; //  For mongoose use Object.id() type annotation
+export type Person = {
     firstName: string; 
     middleName: string;
     lastName: string;
     email: string;
+    password: string;
     phone?: number;
 }
 
+export type User = {
+    id: string; //  For mongoose use Object.id() type annotation
+    userInfo: Person;
+    sourceInfo: sourceInfo;
+}
+
 // Farm Interface
-export interface IFarm {
+export type Farm = {
     id: string; //  For mongoose use Object.id() type annotation
     name: string;
     ownerName: string;
@@ -146,3 +171,6 @@ export interface IFarm {
     description?: string;
     availability: boolean;
 }
+
+export type FindByEmail = { email: string }
+export type FindById = { id: string }

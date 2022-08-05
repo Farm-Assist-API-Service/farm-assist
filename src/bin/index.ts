@@ -4,3 +4,4 @@ import { Mongo } from "../configs/drivers";
 main();
 
 Database.initiate(new Mongo())
+export const Db = new Database();

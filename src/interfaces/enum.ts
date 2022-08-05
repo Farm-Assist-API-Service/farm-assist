@@ -2,6 +2,7 @@ export enum EProtocolStatusCode {
     ok = 200,
     created = 201,
     deleted = 301,
+    badRequest = 400
 }
 
 export enum EProtocolMessages {
@@ -19,4 +20,8 @@ export enum EProtocol {
 
 export enum EcontentType {
     josn = 'application/json'
+}
+
+export enum EDBerrorMessages {
+    
 }

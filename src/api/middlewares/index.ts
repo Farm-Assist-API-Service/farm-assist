@@ -1,6 +1,6 @@
-import { Next, Req, Res, Router } from "../interfaces";
+import { Next, Req, Res, Router } from "../../interfaces";
 const jwt = require('jsonwebtoken');
-import { APP_VAR } from '../configs';
+import { APP_VAR } from '../../configs';
 // Exports all middlewares
 
 export const headerControl = (PORT: number) => {

@@ -6,7 +6,10 @@
     "esModuleInterop": true,                   
     "forceConsistentCasingInFileNames": true,  
     "strict": true,
-    "skipLibCheck": true
-  },
-  "include": ["src/**/*"]
+    "skipLibCheck": true,
+    "baseUrl": ".", 
+    "paths": {
+      "@farm-services/*": ["/src/services/*"]
+    }
+  }
 }

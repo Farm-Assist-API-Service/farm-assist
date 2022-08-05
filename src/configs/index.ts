@@ -21,12 +21,14 @@ export const APP_VAR: {
     httpMethods: Array<string>;
     tokenSecret: string;
     tokenExpiry: number;
+    apiRoot: string;
 } = {
     serverPort: Number(process.env.SERVER_PORT) || 7000,
     allowedOrigins: ['http://localhost:3000'],
     httpMethods: ["GET","POST"],
     tokenSecret: process.env.JWT_TOKEN_SECRET as string,
-    tokenExpiry: Number(process.env.JWT_TOKEN_EXPIRY)
+    tokenExpiry: Number(process.env.JWT_TOKEN_EXPIRY),
+    apiRoot: process.env.APP_API_ROOT as string
 }
 
 // 

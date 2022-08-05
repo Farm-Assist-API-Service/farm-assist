@@ -1,0 +1,15 @@
+# Test API
+GET http://localhost:7000/ping/
+
+###
+POST http://localhost:7000/api/auth/register
+Content-Type: application/json
+
+{
+	"firstName": "Gift",
+    "lastName": "Uko",
+    "middleName": "Matthew",
+    "email": "godsgiftuko@gmail.com",
+    "phone": "63837263839",
+    "password": "123456678"
+}

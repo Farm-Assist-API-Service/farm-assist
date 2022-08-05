@@ -1,6 +1,6 @@
-import { Req, Res, HttpRequest, HttpResponse } from "../interfaces";
+import { Req, Res, HttpRequest, HttpResponse } from "../../interfaces";
 
-export function makeExpressCallback (controller: Function) {
+export const expressHttpAdapter = (controller: any) => {
   return (req: Req, res: Res) => {
     const httpRequest: HttpRequest = {
       body: req.body,
@@ -16,8 +16,10 @@ export function makeExpressCallback (controller: Function) {
       }
     }
 
+    console.log('Adapter is working');
+    
     controller(httpRequest)
-      .then((httpResponse: HttpResponse) => {
+      .then((httpResponse: HttpResponse) => { 
         if (httpResponse) {
           res.set(httpResponse.headers)
         }

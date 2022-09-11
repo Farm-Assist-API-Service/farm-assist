@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["mongodb"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String       @id @default(auto()) @map("_id") @db.ObjectId
+  isVerified Boolean      @default(false)
+  banned     Boolean      @default(false)
+  firstName  String
+  middleName String
+  lastName   String
+  email      String       @unique
+  gender     String?
+  password   String
+  phone      String?
+  role       String       @default("normal")
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  SourceInfo SourceInfo[]
+  farm       Farm?
+}
+
+model SourceInfo {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
+  userId    String   @db.ObjectId
+  ip        String
+  referrer  String
+  userAgent String
+  createdAt DateTime @default(now())
+}
+
+model Farm {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  banned      Boolean
+  isVerified  Boolean
+  user        User      @relation(references: [id], fields: [userId], onDelete: Cascade)
+  userId      String    @unique @db.ObjectId
+  slug        String    @unique
+  name        String
+  ownerName   String
+  contact     String
+  address     String
+  size        Int
+  proucts     Product[]
+  description String?
+}
+
+model Product {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  farm        Farm     @relation(references: [id], fields: [farmId], onDelete: Cascade)
+  farmId      String   @db.ObjectId
+  price       Int
+  qty         Int
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model tasks {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

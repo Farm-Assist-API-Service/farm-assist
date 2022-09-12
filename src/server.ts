@@ -50,7 +50,7 @@ const httpServer = () => {
 
 
   // API STATUS CHECK
-  app.get(`${apiPath}/ping`, requiresAuth(), (req: Req, res: Res, next: Next) =>
+  app.get(`${apiPath}/ping`, (req: Req, res: Res, next: Next) =>
     res.status(200).json({ message: "Pong!" })
   );
 

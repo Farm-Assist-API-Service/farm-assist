@@ -37,7 +37,7 @@ export enum EerrorMessages {
     invalidData = "Sorry! Request is not valid",
     updateFailed = "Sorry! Update failed. Please try again.",
     unRecogEntity = "Unrecognized entity.",
-    unProcessableData = "Unprocessable Entity"
+    unProcessableData = "Unprocessable data entry"
 }
 
 export enum EUserRole {

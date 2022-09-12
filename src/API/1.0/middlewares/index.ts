@@ -2,6 +2,8 @@ const { check, validationResult } = require("express-validator");
 import { EerrorMessages,  EProtocolStatusCode, HttpRequest, Next, Req, Res, Router } from "../../../schemas";
 // Exports all middlewares
 
+type Err = { value: string; msg: string; param: string; location: string };
+
 export default function (PORT: number) {
   return (req: Req, res: Res, next: Next) => {
     const error = new Error("Not found");
@@ -30,11 +32,9 @@ export default function (PORT: number) {
   };
 }
 
-export const userDatavalidator = (req: Req, res: Res) => {
+export const userDatavalidator = (req: Req, res: Res, next: Next) => {
   const errors = validationResult(req);
-  console.log(req.body);
 
-  type Err = { value: string; msg: string; param: string; location: string };
   if (!errors.isEmpty()) {
     let formattedErrs: any = {};
     const errs = errors.array();
@@ -42,7 +42,6 @@ export const userDatavalidator = (req: Req, res: Res) => {
         if (Object.prototype.hasOwnProperty.call(errs, e)) {
             const eachErr: Err = errs[e];
             formattedErrs = { ...formattedErrs, [eachErr.param] : errs[e] };
-            
         }
     }
     
@@ -53,7 +52,7 @@ export const userDatavalidator = (req: Req, res: Res) => {
             body: { reasons: formattedErrs }
         });
   } else {
-    res.send({});
+    next();
   }
 };
 

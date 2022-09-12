@@ -3,15 +3,16 @@ GET http://localhost:3000/api/auth
 Content-Type: application/json 
 
 ###
-POST http://localhost:3000/login
+POST http://localhost:3000/api/user/new
 Content-Type: application/json 
 
 {
- "firstName": "God'sgift",   
- "middleName": "God'sgift",   
- "lastName": "God'sgift",   
- "email": "godsgiftuko@gmail.com",
- "password": "1234"
+ "firstName": "God'sgift",  
+ "middleName": "Matthew",
+ "lastName": "Uko",   
+ "email": "example@gmail.com",
+ "password": "dhbbdhdhhddh.1234GO!",
+ "phone": "+2349071046909"
 }
 
 ###
@@ -20,5 +21,5 @@ Content-Type: application/json
 
 {  
  "email": "godsgiftuko@gmail.com",
- "password": "1234"
+ "password": "tete"
 }

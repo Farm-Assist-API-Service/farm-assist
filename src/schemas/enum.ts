@@ -5,7 +5,8 @@ export enum EProtocolStatusCode {
     // badRequest = 203
     badRequest = 400,
     notFound = 404,
-    unAuthorized = 403
+    unAuthorized = 403,
+    unProcessableEntity = 422
 }
 
 export enum EProtocolMessages {
@@ -31,10 +32,12 @@ export enum EerrorMessages {
     noUser = "No users",
     notFound = "Not found",
     wrongLogin = "Incorrect login credentials",
-    emailExist = "Sorry! This email is unavailable",
+    emailExist = "Sorry! This email isalready registered",
+    unRecogEmail = "Sorry! This email is not valid",
     invalidData = "Sorry! Request is not valid",
     updateFailed = "Sorry! Update failed. Please try again.",
-    unRecogEntity = "Unrecognized entity."
+    unRecogEntity = "Unrecognized entity.",
+    unProcessableData = "Unprocessable Entity"
 }
 
 export enum EUserRole {

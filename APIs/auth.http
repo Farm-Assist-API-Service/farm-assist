@@ -1,0 +1,24 @@
+
+GET http://localhost:3000/api/auth
+Content-Type: application/json 
+
+###
+POST http://localhost:3000/login
+Content-Type: application/json 
+
+{
+ "firstName": "God'sgift",   
+ "middleName": "God'sgift",   
+ "lastName": "God'sgift",   
+ "email": "godsgiftuko@gmail.com",
+ "password": "1234"
+}
+
+###
+POST http://localhost:3000/api/auth
+Content-Type: application/json 
+
+{  
+ "email": "godsgiftuko@gmail.com",
+ "password": "1234"
+}

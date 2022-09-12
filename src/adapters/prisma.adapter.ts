@@ -7,27 +7,8 @@ export const prismaAdapter = {
         return async (data: User) => {
             try {
                 let newEntity;
-                // if (entity == 'user') {
-                //     newEntity = await prisma.user;
-                // } else if (entity == 'farm') {
-                //     newEntity = await prisma.farm;
-                // } else if (entity == 'sourceInfo') {
-                //     newEntity = await prisma.sourceInfo;
-                // } else if (entity == 'product') {
-                //     newEntity = await prisma.product;
-                // } else {
-                //     throw EerrorMessages.unRecogEntity;
-                // }
-                
-                // const created = newEntity.create({
-                //     data
-                // });
-
                 const response = await prisma.user.create({ data });
-        
-                console.log({response, entity});
                 return response;
-                
             } catch (error) {
                 console.log(error);
                 throw error;
@@ -36,7 +17,7 @@ export const prismaAdapter = {
     },
 
     getOne(entity: string) {
-        return async (query: object, options: string[]) => {
+        return async (query: object, options: string[] = []) => {
             try {
                 let include = {};
                 for (const key in options) {
@@ -46,10 +27,16 @@ export const prismaAdapter = {
                     }
                 }
 
-                const response = await prisma.user.findUnique({ 
-                    include,
-                    where: query
-                });
+                const queryOpt: any = !options.length 
+                    ? { 
+                        where: query
+                    }
+                    : { 
+                        include,
+                        where: query
+                    }
+
+                const response = await prisma.user.findUnique(queryOpt);
                 return response;
             } catch (error) {
                 console.log(error);
@@ -78,7 +65,7 @@ export const prismaAdapter = {
         }
     },
 
-    delone(entity: string) {
+    delOne(entity: string) {
         return async (query: any) => {
             try {
                 const response = await prisma.user.delete({
@@ -97,6 +84,41 @@ export const prismaAdapter = {
             try {
                 const response = await prisma.user.deleteMany({});
                 return response;
+            } catch (error) {
+                console.log(error);
+                throw error;
+            }
+        }
+    },
+
+    updateOne(entity: string) {
+        return async (query: object, data: object) => {
+            try {
+                const response = await prisma.user.update({
+                    data,
+                    where: query
+                });
+                return response;
+            } catch (error) {
+                console.log(error);
+                throw error;
+            }
+        }
+    },
+
+    updateMany(entity: string) {
+        return async (query: object, data: object, options: string[]) => {
+            try {
+                const response = await prisma.user.updateMany({
+                    data,
+                    where: query
+                }); 
+
+                const getEntity = await this.getOne(entity)(query, options);
+
+                if (!response.count)
+                    throw EerrorMessages.somethingW;
+                return getEntity;
             } catch (error) {
                 console.log(error);
                 throw error;

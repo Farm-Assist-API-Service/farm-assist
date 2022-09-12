@@ -15,12 +15,22 @@ export const APP_VAR: {
     databaseURI: any; 
     entities: string[];
     apiPath: string;
+    OAuth: {
+        clientID: string;
+        authSecret: string;
+        issuerBaseURL: string;
+    }
 } = {
     serverPort: 3000,
     allowedURL: [''],
     entities: ['user', 'farm'],
     databaseURI: process.env.DATABASE_URL as string,
-    apiPath: process.env.API_PATH as string
+    apiPath: process.env.API_PATH as string,
+    OAuth: {
+        clientID: process.env.CLIENT_ID as string,
+        authSecret: process.env.AUTH_SECRET as string,
+        issuerBaseURL: process.env.ISSUER_BASE_URL as string,
+    }
 }
 
 // 

@@ -2,6 +2,9 @@ import { Req, Res, HttpRequest, HttpResponse } from "../schemas";
 
 export const expressHttpAdapter = (controller: any) => {
   return (req: any, res: Res) => {
+
+    console.log({isAuthenticated: req?.oidc?.isAuthenticated()});
+    
     const httpRequest: HttpRequest = {
       body: req.body,
       query: req.query,
@@ -9,6 +12,7 @@ export const expressHttpAdapter = (controller: any) => {
       url: req.url,
       baseUrl: req.baseUrl,
       ip: req.ip,
+      isAuthenticated: req?.oidc?.isAuthenticated(),
       user: {
         email: req?.user?.data?.email,
         role: req?.user?.data?.role,

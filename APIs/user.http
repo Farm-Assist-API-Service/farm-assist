@@ -1,3 +1,10 @@
+
+GET http://localhost:3000/api/ping
+Content-Type: application/json 
+
+
+###
+
 POST http://localhost:3000/api/user/new
 Content-Type: application/json 
 
@@ -5,15 +12,24 @@ Content-Type: application/json
  "firstName": "God'sgift",   
  "middleName": "God'sgift",   
  "lastName": "God'sgift",   
- "email": "godsgiftuko@gmail.com",
- "password": "1234"
+ "email": "example@gmail.com",
+ "password": "12347"
 }
 
 ###
-GET http://localhost:3000/api/user/all
+GET http://localhost:3000/api/user/all  
 Content-Type: application/json 
 
 
 ###
-GET http://localhost:3000/api/user/godsgiftuko@gmail.com
+GET http://localhost:3000/api/user/example@gmail.com
 Content-Type: application/json 
+
+
+###
+PUT http://localhost:3000/api/user/gift@gmail.com
+Content-Type: application/json 
+
+{
+    "gender": "male"
+}

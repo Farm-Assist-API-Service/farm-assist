@@ -71,6 +71,7 @@ export type HttpRequest = {
         email: string;
         role: { code: string, name: string };
     },
+    isAuthenticated: any;
     ip: string;
     method: string;
     path: string;

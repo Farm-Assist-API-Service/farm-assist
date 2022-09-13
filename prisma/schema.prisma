@@ -41,18 +41,32 @@ model SourceInfo {
 
 model Farm {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  banned      Boolean
-  isVerified  Boolean
+  banned      Boolean   @default(false)
+  isVerified  Boolean   @default(false)
   user        User      @relation(references: [id], fields: [userId], onDelete: Cascade)
   userId      String    @unique @db.ObjectId
+  address     Address   @relation(references: [id], fields: [addressId], onDelete: Cascade)
+  addressId   String    @unique @db.ObjectId
   slug        String    @unique
   name        String
   ownerName   String
-  contact     String
-  address     String
-  size        Int
-  proucts     Product[]
+  contact     String 
+  // size        Int
+  products     Product[]
   description String?
+  category    String
+}
+
+model Address {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  street      String
+  city        String
+  state       String
+  country     String
+  postalCode  String  
+  farm        Farm?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Product {

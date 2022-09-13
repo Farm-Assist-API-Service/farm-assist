@@ -11,11 +11,7 @@ export const farmRules = {
       .not()
       .isEmpty()
       .isString(),
-    check("address", "Please enter your farm address to proceed")
-      .not()
-      .isEmpty()
-      .isString(),
-    check("size", "Please enter your farm size to proceed")
+    check("contact", "Please enter your farm contact detail to proceed")
       .not()
       .isEmpty()
       .isString(),
@@ -23,5 +19,11 @@ export const farmRules = {
       .not()
       .isEmpty()
       .isString(),
+    check("category", "Please choose a category to proceed")
+      .not()
+      .isEmpty()
+      .isString(),
   ],
+  update: [
+  ]
 };

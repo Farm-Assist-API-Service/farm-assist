@@ -1,12 +1,14 @@
+import express from "express";
 import { userRules } from "../../../rules";
 import { Router } from "../../../schemas";
-import { authUser } from "../controllers/user";
-import { userDatavalidator } from "../middlewares";
+import { authUser } from "../controllers";
+import { rulesProcessor } from "../middlewares";
 
-export default function (router: Router, httpAdapter: Function) {
+export default function (httpAdapter: Function) {
+  const router: Router = express.Router();
   router
     .route("/")
-    .post(userRules.auth, userDatavalidator, httpAdapter(authUser));
+    .post(userRules.auth, rulesProcessor, httpAdapter(authUser));
 
   return router;
 }

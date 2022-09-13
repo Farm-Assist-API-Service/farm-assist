@@ -32,12 +32,13 @@ export enum EerrorMessages {
     noUser = "No users",
     notFound = "Not found",
     wrongLogin = "Incorrect login credentials",
-    emailExist = "Sorry! This email isalready registered",
+    emailExist = "Sorry! This email is already registered",
     unRecogEmail = "Sorry! This email is not valid",
     invalidData = "Sorry! Request is not valid",
-    updateFailed = "Sorry! Update failed. Please try again.",
-    unRecogEntity = "Unrecognized entity.",
-    unProcessableData = "Unprocessable data entry"
+    updateFailed = "Sorry! Update failed. Please try again",
+    unRecogEntity = "Unrecognized entity",
+    unProcessableData = "Unprocessable data entry",
+    farmExist = "Sorry! A farm is already registered with this name",
 }
 
 export enum EUserRole {

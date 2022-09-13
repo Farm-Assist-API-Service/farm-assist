@@ -2,7 +2,7 @@ import { createServer } from "http";
 import express from "express";
 import cors from "cors";
 import { Req, Res, App, Next, Router } from "./schemas";
-import { userRoute, authRoute } from "./API/1.0/routes";
+import { userRoute, authRoute, farmRoute } from "./API/1.0/routes";
 import { APP_VAR } from "./configs";
 import { expressHttpAdapter } from "./adapters/express.adapter";
 import { auth, requiresAuth } from "express-openid-connect";
@@ -38,16 +38,15 @@ const httpServer = () => {
     config.baseURL = `http://localhost:${PORT}`;
   }
 
-//   app.use(auth(config));
+  //   app.use(auth(config));
 
   // Middleware to make the `user` object available for all views
-//   app.use(function (req, res, next) {
-//     res.locals.user = req.oidc.user;
-//     console.log(res.locals.user);
-    
-//     next();
-//   });
+  //   app.use(function (req, res, next) {
+  //     res.locals.user = req.oidc.user;
+  //     console.log(res.locals.user);
 
+  //     next();
+  //   });
 
   // API STATUS CHECK
   app.get(`${apiPath}/ping`, (req: Req, res: Res, next: Next) =>
@@ -56,8 +55,9 @@ const httpServer = () => {
 
   // app.use(middlewares(PORT));
   // ROUTES
-  app.use(`${apiPath}/auth`, authRoute(router, expressHttpAdapter));
-  app.use(`${apiPath}/user`,  userRoute(router, expressHttpAdapter));
+  app.use(`${apiPath}/auth`, authRoute(expressHttpAdapter));
+  app.use(`${apiPath}/user`, userRoute(expressHttpAdapter));
+  app.use(`${apiPath}/farm`, farmRoute(expressHttpAdapter));
 
   const httpServer = createServer(app).listen(PORT, () =>
     console.log(`Listening on ${config.baseURL}`)

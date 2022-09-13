@@ -32,7 +32,7 @@ export default function (PORT: number) {
   };
 }
 
-export const userDatavalidator = (req: Req, res: Res, next: Next) => {
+export const rulesProcessor = (req: Req, res: Res, next: Next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {

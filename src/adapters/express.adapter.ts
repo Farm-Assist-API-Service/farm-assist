@@ -2,9 +2,6 @@ import { Req, Res, HttpRequest, HttpResponse } from "../schemas";
 
 export const expressHttpAdapter = (controller: any) => {
   return (req: any, res: Res) => {
-
-    console.log({isAuthenticated: req?.oidc?.isAuthenticated()});
-    
     const httpRequest: HttpRequest = {
       body: req.body,
       query: req.query,

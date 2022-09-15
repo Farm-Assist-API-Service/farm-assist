@@ -1,35 +1,45 @@
-
-GET http://localhost:3000/api/ping
-Content-Type: application/json 
-
+@host=localhost:3000
+@api_route=http://{{host}}/api
+@user_route={{api_route}}/user
+@content_type=application/json
+@bear_token=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImV4YW1wbGVAZ21haWwuY29tIiwicm9sZSI6Im5vcm1hbCIsImlhdCI6MTY2MzA4NzU5NiwiZXhwIjoxNjYzMjYwMzk2fQ.H2Zw2MYBQlGAdaz29VL0P9A5AQq1wPvVIsj0D6LTtsU
 
 ###
+GET {{api_route}}/ping
+Content-Type: {{content_type}} 
+###
 
-POST http://localhost:3000/api/user/new
-Content-Type: application/json 
+POST {{user_route}}/new
+Content-Type: {{content_type}} 
 
 {
  "firstName": "God'sgift",   
  "middleName": "Matthew",   
- "lastName": "Uko",   
- "email": "example@gmail.com",
- "password": "1234sweee"
+ "lastName": "Uko",
+ "email": "gifty@gmail.com",
+ "password": "abc1234GO!"
 }
 
 ###
-GET http://localhost:3000/api/user/all  
-Content-Type: application/json 
-
-
-###
-GET http://localhost:3000/api/user/example@gmail.com
-Content-Type: application/json 
-
+GET {{user_route}}/all  
+Content-Type: {{content_type}} 
+Authorization: {{bear_token}}
 
 ###
-PUT http://localhost:3000/api/user/gift@gmail.com
-Content-Type: application/json 
+GET {{user_route}}/gift@gmail.com
+Content-Type: {{content_type}} 
+Authorization: {{bear_token}}
+
+###
+PUT {{user_route}}/giftee@gmail.com
+Content-Type: {{content_type}} 
+Authorization: {{bear_token}}
 
 {
-    "gender": "male"
+    "email": "giftee@gmail.com"
 }
+
+###
+DELETE {{user_route}}/gifty@gmail.com
+Content-Type: {{content_type}} 
+Authorization: {{bear_token}}

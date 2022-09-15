@@ -2,8 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["mongodb"]
+  provider = "prisma-client-js"
+  // previewFeatures = ["mongodb"]
 }
 
 datasource db {
@@ -25,7 +25,7 @@ model User {
   role       String       @default("normal")
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
-  SourceInfo SourceInfo[]
+  sourceInfo SourceInfo[]
   farm       Farm?
 }
 
@@ -45,28 +45,28 @@ model Farm {
   isVerified  Boolean   @default(false)
   user        User      @relation(references: [id], fields: [userId], onDelete: Cascade)
   userId      String    @unique @db.ObjectId
-  address     Address   @relation(references: [id], fields: [addressId], onDelete: Cascade)
-  addressId   String    @unique @db.ObjectId
-  slug        String    @unique
-  name        String
+  slug        String?    @unique
+  name        String    @unique
   ownerName   String
-  contact     String 
+  contact     String
   // size        Int
-  products     Product[]
-  description String?
+  products    Product[]
+  address     Address?
+  description String
   category    String
 }
 
 model Address {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  street      String
-  city        String
-  state       String
-  country     String
-  postalCode  String  
-  farm        Farm?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  farm       Farm     @relation(references: [id], fields: [farmId], onDelete: Cascade)
+  farmId     String   @unique @db.ObjectId
+  street     String
+  city       String
+  state      String
+  country    String
+  postalCode String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Product {
@@ -80,7 +80,7 @@ model Product {
   updatedAt   DateTime @updatedAt
 }
 
-model tasks {
+model Tasks {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   description String

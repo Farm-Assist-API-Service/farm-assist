@@ -15,6 +15,13 @@ export const APP_VAR: {
     databaseURI: any; 
     entities: string[];
     apiPath: string;
+    jwt: {
+        exp: string;
+        secret: string;
+    },
+    hashing: {
+        salt: number
+    },
     OAuth: {
         clientID: string;
         authSecret: string;
@@ -26,6 +33,13 @@ export const APP_VAR: {
     entities: ['user', 'farm'],
     databaseURI: process.env.DATABASE_URL as string,
     apiPath: process.env.API_PATH as string,
+    jwt: {
+        exp: process.env.JWT_EXP as string,
+        secret: process.env.JWT_SECRET as string
+    },
+    hashing: {
+        salt: Number(process.env.HASHING_SALT)
+    },
     OAuth: {
         clientID: process.env.CLIENT_ID as string,
         authSecret: process.env.AUTH_SECRET as string,

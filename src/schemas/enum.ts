@@ -31,6 +31,7 @@ export enum EerrorMessages {
     connectionErr = "unable to connect",
     noUser = "No users",
     notFound = "Not found",
+    unAuthorized = "Access Denied to the resource!",
     wrongLogin = "Incorrect login credentials",
     emailExist = "Sorry! This email is already registered",
     unRecogEmail = "Sorry! This email is not valid",

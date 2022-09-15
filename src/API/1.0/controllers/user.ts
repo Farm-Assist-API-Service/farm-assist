@@ -1,22 +1,34 @@
-import bcrypt from "bcrypt";
-import { HttpRequest, EcontentType, EProtocolStatusCode, EProtocolMessages, EerrorMessages } from "../../../schemas";
+import { HttpRequest, EcontentType, EProtocolStatusCode, EProtocolMessages, EerrorMessages, User } from "../../../schemas";
+import { hashUtil, tokenUtil } from "../../../utils/helpers";
 import Repository from "../repository";
 
-const { create, getAll, getOne, modifyOne } = new Repository('user');
+const { create, getAll, getOne, modifyOne, delOne } = new Repository('user');
 
 export const createUser = async (request: HttpRequest) => {
     try {
+        let emailExist: User;
         const body = request.body;
-    
-        const emailExist = await getOne({ email: body.email }, ['SourceInfo']);
+        const {
+            count,
+            users
+        } = await getAll(['sourceInfo', 'farm']);
+
+        if (!count) {
+            await createAdmin();
+        }
         
+        const thisUser = (user: User) => user.email === body.email;
+        emailExist = users.find(thisUser);
+        console.log({emailExist});
+        
+        // emailExist = await getOne({ email: body.email }, ['sourceInfo']);
+
         if (emailExist) {
             throw EerrorMessages.emailExist;
         }
 
         const { password, ...othersFields } = body;
-        const salt = bcrypt.genSaltSync(10);
-        const hashedPassword = bcrypt.hashSync(password, salt);
+        const hashedPassword = await hashUtil.generateHash(password);
 
         const modifiedData = { ...othersFields };
         modifiedData["password"] = hashedPassword;
@@ -34,7 +46,6 @@ export const createUser = async (request: HttpRequest) => {
         }
         } catch (e: any) {
         // TODO: Error logging
-        console.log({e})
 
         return {
             headers: {
@@ -53,21 +64,22 @@ export const authUser = async (request: HttpRequest) => {
     try {
         const { email, password } = request.body;
     
-        const emailExist = await getOne({ email }, ['SourceInfo']);
+        const emailExist = await getOne({ email }, ['sourceInfo']);
         
         if (!emailExist) {
             throw EerrorMessages.wrongLogin;
         }
 
         const { password: savedPasswordHash } = emailExist;
+        const match = await hashUtil.verifyHash(password, savedPasswordHash);
 
-        console.log({savedPasswordHash});
-        // Compare password
+        if (!match) {
+            throw EerrorMessages.wrongLogin;
+        }
 
-        // if (!emailExist) {
-        //     throw EerrorMessages.wrongLogin;
-        // }
-
+        const payload = { email: emailExist.email, role: emailExist.role }
+        const token = tokenUtil.generateToken(payload);
+        
         return {
             headers: {
                 contentType: EcontentType.json,
@@ -75,12 +87,55 @@ export const authUser = async (request: HttpRequest) => {
             statusCode: EProtocolStatusCode.ok,
             body: { 
                 message: EProtocolMessages.ok,
-                data: {}
+                data: { token }
             }
         }
         } catch (e: any) {
         // TODO: Error logging
-        console.log({e})
+
+        return {
+            headers: {
+                contentType: EcontentType.json
+            },
+            statusCode: EProtocolStatusCode.badRequest,
+            body: {
+                message: EProtocolMessages.failed,
+                error: e?.message || e
+            }
+        }
+    }
+}
+
+export const delAUser = async (request: HttpRequest) => {
+    try {
+            const param = request.params.id;
+            const query = isEmail.valid(param) 
+                ? { email: param }
+                : { id: param }
+
+            const isValidEmail = isEmail.valid(query.email);
+            if (!isValidEmail) {
+                throw EerrorMessages.unRecogEmail;
+            }
+
+            const userExist = await getOne(query);
+            if (!userExist) {
+                throw EerrorMessages.notFound;
+            }
+
+            const deleted = await delOne(query);
+            return {
+                headers: {
+                    contentType: EcontentType.json,
+                },
+                statusCode: EProtocolStatusCode.ok,
+                body: { 
+                    message: EProtocolMessages.deleted,
+                    data: deleted
+                }
+            }
+    } catch (e: any) {
+        // TODO: Error logging
 
         return {
             headers: {
@@ -98,8 +153,8 @@ export const authUser = async (request: HttpRequest) => {
 export const getAUser = async (request: HttpRequest) => {
     try {
         const query = request.params;
-        const data = await getOne({ email: query.id }, ['SourceInfo']);
-
+        const user = await getOne({ email: query.id }, ['sourceInfo']);
+        const data = !user ? EerrorMessages.notFound : user;
         return {
             headers: {
                 contentType: EcontentType.json,
@@ -110,9 +165,8 @@ export const getAUser = async (request: HttpRequest) => {
                 data
             }
         }
-        } catch (e: any) {
+    } catch (e: any) {
         // TODO: Error logging
-        console.log(e)
 
         return {
             headers: {
@@ -129,8 +183,7 @@ export const getAUser = async (request: HttpRequest) => {
 
 export const getAllUsers = async (request: HttpRequest) => {
     try {
-        const data = await getAll(['SourceInfo', 'farm']);
-
+        const users = await getAll(['sourceInfo', 'farm']);
         return {
             headers: {
                 contentType: EcontentType.json,
@@ -138,12 +191,11 @@ export const getAllUsers = async (request: HttpRequest) => {
             statusCode: EProtocolStatusCode.ok,
             body: { 
                 message: EProtocolMessages.ok,
-                data
+                data: users
             }
         }
-        } catch (e: any) {
+    } catch (e: any) {
         // TODO: Error logging
-        console.log(e)
 
         return {
             headers: {
@@ -165,18 +217,50 @@ export const modifyUser = async (request: HttpRequest) => {
         const query = isEmail.valid(param) 
             ? { email: param }
             : { id: param }
-        let modifiedData = body;
 
         const isValidEmail = isEmail.valid(query.email);
         if (!isValidEmail) {
             throw EerrorMessages.unRecogEmail;
         }
 
-        const emailExist = await getOne(query, ['SourceInfo']);
+        const emailExist = await getOne(query, ['sourceInfo']);
         
         if (!emailExist) {
             throw EerrorMessages.notFound;
         }
+
+        let modifiedData = {
+            isVerified: body.isVerified 
+                ? body.isVerified 
+                : emailExist.isVerified,
+            banned: body.banned 
+                ? body.banned 
+                : emailExist.banned,
+            firstName: body.firstName 
+                ? body.firstName 
+                : emailExist.firstName,
+            middleName: body.middleName 
+                ? body.middleName 
+                : emailExist.middleName,
+            lastName: body.lastName 
+                ? body.lastName 
+                : emailExist.lastName,
+            gender: body.gender 
+                ? body.gender 
+                : emailExist.gender,
+            phone: body.phone 
+                ? body.phone 
+                : emailExist.phone,
+            password: body.password 
+                ? emailExist.password 
+                : emailExist.password,
+            email: body.email 
+                ? body.email 
+                : emailExist.email,
+            role: body.role 
+                ? body.role 
+                : emailExist.role
+        };
 
         if ('email' in body) {
             const emailExist = await isEmail.registerable(body);
@@ -187,14 +271,14 @@ export const modifyUser = async (request: HttpRequest) => {
 
         if ('password' in body) {
             const { password, ...othersFields } = body;
-            const salt = bcrypt.genSaltSync(10);
-            const hashedPassword = bcrypt.hashSync(password, salt);
+            const hashedPassword = await hashUtil.generateHash(password);
 
             modifiedData = { ...othersFields };
             modifiedData["password"] = hashedPassword;
         }
-        
-        const data = await modifyOne(query, modifiedData, []);
+
+        const data = await modifyOne(query, modifiedData);
+        delete data.password;
 
         return {
             headers: {
@@ -202,13 +286,12 @@ export const modifyUser = async (request: HttpRequest) => {
             },
             statusCode: EProtocolStatusCode.ok,
             body: { 
-                message: EProtocolMessages.ok,
-                data   
+                message: EProtocolMessages.updated,
+                data
             }
         }
-        } catch (e: any) {
+    } catch (e: any) {
         // TODO: Error logging
-        console.log(e)
 
         return {
             headers: {
@@ -235,7 +318,7 @@ const isEmail = {
     },
     async registered(email: string) { // Throw error for unregistered email entry
         try {
-            const emailExist = await getOne({ email }, ['SourceInfo']);
+            const emailExist = await getOne({ email }, ['sourceInfo']);
         
             if (emailExist) {
                 throw EerrorMessages.emailExist;
@@ -250,7 +333,7 @@ const isEmail = {
         try {
             // if ('email' in data) {
             const query = { email: data.email }
-            const emailExist = await getOne(query, ['SourceInfo']);
+            const emailExist = await getOne(query, ['sourceInfo']);
             
             return emailExist
                 ? true
@@ -260,4 +343,9 @@ const isEmail = {
             throw e;
         }
     },
+}
+
+const createAdmin = async () => {
+        console.log('Created admin');
+        
 }

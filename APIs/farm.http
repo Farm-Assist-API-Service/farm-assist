@@ -1,34 +1,55 @@
-GET http://localhost:3000/api/farm/eggorand
-Content-Type: application/json
+@host=localhost:3000
+@api_route=http://{{host}}/api
+@user_route={{api_route}}/user
+@farm_route={{api_route}}/farm
+@content_type=application/json
+@bearer_token=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImV4YW1wbGVAZ21haWwuY29tIiwicm9sZSI6Im5vcm1hbCIsImlhdCI6MTY2MzA4NzU5NiwiZXhwIjoxNjYzMjYwMzk2fQ.H2Zw2MYBQlGAdaz29VL0P9A5AQq1wPvVIsj0D6LTtsU
 
+DELETE  {{farm_route}}/eggorand
+Content-Type: {{content_type}}
+Authorization: {{bearer_token}}
 ###
 
-POST http://localhost:3000/api/farm/new
-Content-Type: application/json
+POST {{farm_route}}/new
+Content-Type: {{content_type}}
+Authorization: {{bearer_token}}
 
 {
-    "name": "Eggorand",
+    "name": "Millland",
+    "userId": "63207b1e2350b0fb5de816f1",
     "ownerName": "Uko, God'sgift Matthew",
     "contact": "+2349071046909",
     "description": "This is an egg farm",
-    "category": "livestock"
+    "category": "liv"
 }
 
 
 ###
+# POST {{farm_route}}/new
+# Content-Type: {{content_type}}
+# Authorization: {{bearer_token}}
 
-POST http://localhost:3000/api/farm/new
-Content-Type: application/json
+# {
+#     "name": "Eggorand",    
+#     "ownerName": "Uko, God'sgift Matthew",  
+#     "contact": "+2349071046909",
+#     "description": "This is an egg farm",
+#     "category": "livestock",
+#     "postalCode": "52060",
+#     "street": "Nduk street",
+#     "city": "Uyo",
+#     "state": "Akwa Ibom",
+#     "country": "Nigeria"
+# }
 
-{
-    "name": "Eggorand",
-    "ownerName": "Uko, God'sgift Matthew",
-    "contact": "+2349071046909",
-    "description": "This is an egg farm",
-    "category": "livestock",
-    "postalCode": "52060",
-    "street": "Nduk street",
-    "city": "Uyo",
-    "state": "Akwa Ibom",
-    "country": "Nigeria"
-}
+###
+GET {{farm_route}}/Millland
+Content-Type: {{content_type}}
+Authorization: {{bearer_token}}
+
+###
+GET {{farm_route}}/all
+Content-Type: {{content_type}}
+Authorization: {{bearer_token}}
+
+###

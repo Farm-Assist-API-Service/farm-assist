@@ -59,6 +59,7 @@ export type HttpHeader = {
   contentType?: string;
   referrer?: string;
   userAgent?: string;
+  authorization?: string;
 } 
 
 export type HttpRequest = {
@@ -82,6 +83,7 @@ export type HttpResponse = {
   headers: HttpHeader;
   body: object;
   statusCode: number;
+  next?: any;
 }
 
 export type Interactors = {

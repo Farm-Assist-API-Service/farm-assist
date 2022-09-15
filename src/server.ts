@@ -6,6 +6,7 @@ import { userRoute, authRoute, farmRoute } from "./API/1.0/routes";
 import { APP_VAR } from "./configs";
 import { expressHttpAdapter } from "./adapters/express.adapter";
 import { auth, requiresAuth } from "express-openid-connect";
+import { generateAccessToken, verifyAccessToken } from "./API/1.0/middlewares";
 
 const httpServer = () => {
   const PORT = APP_VAR.serverPort;
@@ -56,8 +57,8 @@ const httpServer = () => {
   // app.use(middlewares(PORT));
   // ROUTES
   app.use(`${apiPath}/auth`, authRoute(expressHttpAdapter));
-  app.use(`${apiPath}/user`, userRoute(expressHttpAdapter));
-  app.use(`${apiPath}/farm`, farmRoute(expressHttpAdapter));
+  app.use(`${apiPath}/user`, expressHttpAdapter(verifyAccessToken), userRoute(expressHttpAdapter));
+  app.use(`${apiPath}/farm`, expressHttpAdapter(verifyAccessToken), farmRoute(expressHttpAdapter));
 
   const httpServer = createServer(app).listen(PORT, () =>
     console.log(`Listening on ${config.baseURL}`)

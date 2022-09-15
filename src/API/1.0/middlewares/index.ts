@@ -1,5 +1,16 @@
 const { check, validationResult } = require("express-validator");
-import { EerrorMessages,  EProtocolStatusCode, HttpRequest, Next, Req, Res, Router } from "../../../schemas";
+import {
+  EerrorMessages,
+  EProtocolStatusCode,
+  HttpRequest,
+  Next,
+  Req,
+  Res,
+  EcontentType,
+  EProtocolMessages,
+  Router,
+} from "../../../schemas";
+import { tokenUtil } from "../../../utils/helpers";
 // Exports all middlewares
 
 type Err = { value: string; msg: string; param: string; location: string };
@@ -39,29 +50,57 @@ export const rulesProcessor = (req: Req, res: Res, next: Next) => {
     let formattedErrs: any = {};
     const errs = errors.array();
     for (const e in errs) {
-        if (Object.prototype.hasOwnProperty.call(errs, e)) {
-            const eachErr: Err = errs[e];
-            formattedErrs = { ...formattedErrs, [eachErr.param] : errs[e] };
-        }
+      if (Object.prototype.hasOwnProperty.call(errs, e)) {
+        const eachErr: Err = errs[e];
+        formattedErrs = { ...formattedErrs, [eachErr.param]: errs[e] };
+      }
     }
-    
-    return res
-        .status(EProtocolStatusCode.unProcessableEntity)
-        .send({
-            error: EerrorMessages.unProcessableData,
-            body: { reasons: formattedErrs }
-        });
+
+    return res.status(EProtocolStatusCode.unProcessableEntity).send({
+      error: EerrorMessages.unProcessableData,
+      body: { reasons: formattedErrs },
+    });
   } else {
     next();
   }
 };
 
-// export const userDatavalidator = {
-//     creation:  [
-//         check('firstName').not().isEmpty().withMessage('First name must have more than 5 characters'),
-//         check('middleName').not().isEmpty().withMessage('Middle name must have more than 5 characters'),
-//         check('lastName').not().isEmpty().withMessage('Latt name must have more than 5 characters'),
-//         check('email', 'Your email is not valid').not().isEmpty(),
-//         check('password', 'Your password must be at least 5 characters').not().isEmpty(),
-//       ],
-// }
+export const generateAccessToken = (data: any) => {
+  return tokenUtil.generateToken(data);
+};
+
+export const verifyAccessToken = async ({ url, headers }: HttpRequest) => {
+  try {
+    let token;
+    if (url.includes("new")) {
+      return {
+        next: true
+      };
+    }
+
+    if (headers.authorization && headers.authorization.startsWith("Bearer")) {
+      token = headers.authorization.split(" ")[1];
+    }
+
+    if (!token) {
+      throw EerrorMessages.unAuthorized;
+    }
+
+    const decodedToken = tokenUtil.verifyToken(token);
+    return {
+      next: true
+    };
+  } catch (e: any) {
+    // TODO: Error logging
+    return {
+      headers: {
+        contentType: EcontentType.json,
+      },
+      statusCode: EProtocolStatusCode.unAuthorized,
+      body: {
+        message: EProtocolMessages.failed,
+        error: e?.message || e,
+      },
+    };
+  }
+};

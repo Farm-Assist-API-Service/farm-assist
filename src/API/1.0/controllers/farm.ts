@@ -13,17 +13,13 @@ const { create, getAll, getOne, modifyOne } = new Repository("farm");
 export const createFarm = async (request: HttpRequest) => {
   try {
     const body = request.body;
-    console.log(body);
-    
+    const nameExist = await getOne({ name: body.name }, []);
 
-    // const nameExist = await getOne({ name: body.name }, []);
+    if (nameExist) {
+      throw EerrorMessages.farmExist;
+    }
 
-    // if (nameExist) {
-    //   throw EerrorMessages.farmExist;
-    // }
-
-    // const data = await create(body);
-
+    const data = await create(body);
     return {
       headers: {
         contentType: EcontentType.json,
@@ -31,13 +27,11 @@ export const createFarm = async (request: HttpRequest) => {
       statusCode: EProtocolStatusCode.created,
       body: {
         message: EProtocolMessages.created,
-        data: {},
+        data,
       },
     };
   } catch (e: any) {
     // TODO: Error logging
-    console.log({ e });
-
     return {
       headers: {
         contentType: EcontentType.json,
@@ -54,7 +48,8 @@ export const createFarm = async (request: HttpRequest) => {
 export const getAFarm = async (request: HttpRequest) => {
   try {
     const query = request.params;
-    const data = await getOne(query, []);
+    console.log(query);
+    const data = await getOne(query, ['products', 'address']);
 
     return {
       headers: {
@@ -64,6 +59,37 @@ export const getAFarm = async (request: HttpRequest) => {
       body: {
         message: EProtocolMessages.ok,
         data,
+      },
+    };
+  } catch (e: any) {
+    // TODO: Error logging
+    console.log(e);
+
+    return {
+      headers: {
+        contentType: EcontentType.json,
+      },
+      statusCode: EProtocolStatusCode.badRequest,
+      body: {
+        message: EProtocolMessages.failed,
+        error: e?.message || e,
+      },
+    };
+  }
+};
+
+export const delAFarm = async (request: HttpRequest) => {
+  try {
+    const query = request.params;
+
+    return {
+      headers: {
+        contentType: EcontentType.json,
+      },
+      statusCode: EProtocolStatusCode.deleted,
+      body: {
+        message: EProtocolMessages.deleted,
+        data: {},
       },
     };
   } catch (e: any) {

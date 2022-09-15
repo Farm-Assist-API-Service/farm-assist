@@ -1,0 +1,15 @@
+"rest-client.environmentVariables": {
+    "$shared": {
+        "version": "v1"
+    },
+    "local": {
+        "version": "v2",
+        "host": "localhost",
+        "port": 3000,
+        "secretKey": "DEVSECRET"
+    },
+    "production": {
+        "host": "example.com",
+        "secretKey" : "PRODSECRET"
+    }
+}

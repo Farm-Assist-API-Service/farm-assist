@@ -1,4 +1,5 @@
 import { prismaAdapter } from "../../../adapters/prisma.adapter";
+import { EerrorMessages } from "../../../schemas";
 
 export default class Repository {
     protected entity: string;
@@ -9,6 +10,8 @@ export default class Repository {
         this.getAll = this.getAll.bind(this);
         this.getOne = this.getOne.bind(this);
         this.modifyOne = this.modifyOne.bind(this);
+        this.delOne = this.delOne.bind(this);
+        this.delAll = this.delAll.bind(this);
     }
 
     async create(data: any) {
@@ -21,7 +24,7 @@ export default class Repository {
         }
     }
 
-    async getOne(data: object, options: string[]) {
+    async getOne(data: object, options: string[] = []) {
         try {
             const getEntity = prismaAdapter.getOne(this.entity);
             const responseData = await getEntity(data, options);
@@ -35,9 +38,10 @@ export default class Repository {
         try {
             const getAllEntity = prismaAdapter.getAll(this.entity);
             const responseData = await getAllEntity(options);
+            const count = responseData.length;
             return {
-                count: responseData.length,
-                [this.entity]: responseData,
+                count,
+                [this.entity]: !count ? EerrorMessages.noUser : responseData,
             };
         } catch (error) {
             throw error;
@@ -64,7 +68,7 @@ export default class Repository {
         }
     }
 
-    async modifyOne(query: object, data: any, options: string[]) {
+    async modifyOne(query: object, data: any, options: string[] = []) {
         try {
             const modifyEntity = prismaAdapter.updateMany(this.entity);
             const responseData = await modifyEntity(query, data, options);

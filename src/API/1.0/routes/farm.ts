@@ -3,7 +3,8 @@ import { farmRules } from "../../../rules";
 import { Router } from "../../../schemas";
 import {
   createFarm,
-  getAFarm
+  getAFarm,
+  delAFarm
 } from "../controllers/farm";
 import { rulesProcessor } from "../middlewares";
 
@@ -21,6 +22,7 @@ export default function (httpAdapter: Function) {
 
   router.route("/:name")
     .get(httpAdapter(getAFarm))
+    .delete(httpAdapter(delAFarm))
     
   return router;
 }

@@ -1,7 +1,7 @@
-import { Req, Res, HttpRequest, HttpResponse } from "../schemas";
+import { Req, Res, HttpRequest, HttpResponse, Next } from "../schemas";
 
 export const expressHttpAdapter = (controller: any) => {
-  return (req: any, res: Res) => {
+  return (req: any, res: Res, next: Next) => {
     const httpRequest: HttpRequest = {
       body: req.body,
       query: req.query,
@@ -19,12 +19,16 @@ export const expressHttpAdapter = (controller: any) => {
       headers: {
         contentType: req.get('Content-Type'),
         referrer: req.get('referer'),
+        authorization: req.get('authorization'),
         userAgent: req.get('User-Agent')
       }
     }
 
     controller(httpRequest)
       .then((httpResponse: HttpResponse) => { 
+        if (httpResponse.next) {
+          return next();
+        }
         if (httpResponse) {
           res.set(httpResponse.headers)
         }

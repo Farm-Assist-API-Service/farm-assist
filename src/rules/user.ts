@@ -38,10 +38,11 @@ export const userRules = {
       .isEmpty(),
     check("password", "Please enter your password")
       .not()
-      .isEmpty(),
+      .isEmpty()
   ],
   update: [
     check("firstName")
+      .optional()
       .isLength({ min: 3 })
       .withMessage("First name must have more than 3 characters")
       // .isString()
@@ -49,6 +50,7 @@ export const userRules = {
       // .withMessage("First name must be string")
       ,
     check("middleName")
+      .optional()
       .isLength({ min: 3 })
       .withMessage("Middle name must have more than 3 characters")
       // .isString()
@@ -56,6 +58,7 @@ export const userRules = {
       // .withMessage("Middle name must be string")
       ,
     check("lastName")
+      .optional()
       .isLength({ min: 3 })
       .withMessage("Last name must have more than 3 characters")
       // .isString()
@@ -63,13 +66,16 @@ export const userRules = {
       // .withMessage("Last name must be string")
       ,
     check("email")
+      .optional()
       .isEmail()
       .withMessage("Your email is not valid"),
     check("phone")
+      .optional()
       // .not()
       .isMobilePhone('en-NG')
-      .withMessage("Moobile number is invalid"),
+      .withMessage("Mobile number is invalid"),
     check("password")
+      .optional()
       .isStrongPassword()
       .withMessage("Password must contain special characters")
       .isLength({ min: 8 })

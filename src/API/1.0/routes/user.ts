@@ -6,21 +6,35 @@ import {
   getAllUsers,
   getAUser,
   modifyUser,
+  delAUser,
 } from "../controllers/user";
 import { rulesProcessor } from "../middlewares";
 
 export default function (httpAdapter: Function) {
   const router: Router = express.Router();
-  router
-    .route("/new")
+  router.route("/new")
     .post(
       userRules.creation,
       rulesProcessor,
       httpAdapter(createUser)
     );
 
-  router.route("/all").get(httpAdapter(getAllUsers));
+  router.route("/all")
+    .get(
+      httpAdapter(getAllUsers)
+    );
 
-  router.route("/:id").get(httpAdapter(getAUser)).put(httpAdapter(modifyUser));
+  router.route("/:id")
+    .get(
+      httpAdapter(getAUser)
+    )
+    .put(
+      userRules.update,
+      rulesProcessor,
+      httpAdapter(modifyUser)
+    )
+    .delete(
+      httpAdapter(delAUser)
+    );
   return router;
 }

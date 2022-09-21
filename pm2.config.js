@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
-      {
-          name: 'My Application',
+      { 
+          name: 'Farm Assist',
           script: './build/server.js',
       },
   ],

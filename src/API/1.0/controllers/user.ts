@@ -8,11 +8,9 @@ export const createUser = async (request: HttpRequest) => {
     try {
         let emailExist: User;
         const body = request.body;
-        const all = await getAll(['sourceInfo', 'farm']);
-        console.log({all});
         const {
             count,
-            users
+            user
         } = await getAll(['sourceInfo', 'farm']);
         
 
@@ -22,7 +20,7 @@ export const createUser = async (request: HttpRequest) => {
         }
         
         const thisUser = (user: User) => user.email === body.email;
-        emailExist = users.find(thisUser);
+        emailExist = user.find(thisUser);
         console.log({emailExist});
         
         // emailExist = await getOne({ email: body.email }, ['sourceInfo']);

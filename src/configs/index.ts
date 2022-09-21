@@ -10,6 +10,7 @@ export const web3VARIABLES = {}
 
 // App configuration
 export const APP_VAR: {
+    env_mode: string;
     serverPort: number;
     allowedURL: Array<string>;
     databaseURI: any; 
@@ -28,6 +29,7 @@ export const APP_VAR: {
         issuerBaseURL: string;
     }
 } = {
+    env_mode: process.env.NODE_ENV || 'development',
     serverPort: 3000,
     allowedURL: [''],
     entities: ['user', 'farm'],

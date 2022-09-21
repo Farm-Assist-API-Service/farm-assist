@@ -8,11 +8,15 @@ export const createUser = async (request: HttpRequest) => {
     try {
         let emailExist: User;
         const body = request.body;
+        const all = await getAll(['sourceInfo', 'farm']);
+        console.log({all});
         const {
             count,
             users
         } = await getAll(['sourceInfo', 'farm']);
+        
 
+        
         if (!count) {
             await createAdmin();
         }

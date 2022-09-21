@@ -5,12 +5,12 @@ import { Req, Res, App, Next, Router } from "./schemas";
 import { userRoute, authRoute, farmRoute } from "./API/1.0/routes";
 import { APP_VAR } from "./configs";
 import { expressHttpAdapter } from "./adapters/express.adapter";
-import { auth, requiresAuth } from "express-openid-connect";
+// import { auth, requiresAuth } from "express-openid-connect";
 import { generateAccessToken, verifyAccessToken } from "./API/1.0/middlewares";
 
 const httpServer = () => {
   const PORT = APP_VAR.serverPort;
-  const apiPath = APP_VAR.apiPath;
+  const apiPath = APP_VAR.apiPath; 
   const app: App = express();
   const router: Router = express.Router();
   const corsOption = {

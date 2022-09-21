@@ -1,16 +1,25 @@
-@host=localhost:3000
-@api_route=http://{{host}}/api
-@user_route={{api_route}}/user
-@content_type=application/json
-@bear_token=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImV4YW1wbGVAZ21haWwuY29tIiwicm9sZSI6Im5vcm1hbCIsImlhdCI6MTY2MzA4NzU5NiwiZXhwIjoxNjYzMjYwMzk2fQ.H2Zw2MYBQlGAdaz29VL0P9A5AQq1wPvVIsj0D6LTtsU
+
+@user_route={{apiHost}}/user
+@contentType=application/json
+@bear_token=Bearer {{login.response.body.data.token}}
 
 ###
-GET {{api_route}}/ping
-Content-Type: {{content_type}} 
+GET {{apiHost}}/ping
+Content-Type: {{contentType}} 
 ###
 
+# @name login
+POST {{apiHost}}/auth
+Content-Type: {{contentType}} 
+
+{  
+ "email": "john@gmail.com",
+ "password": "dhbbdhdhhddh.1234GO!" 
+}
+
+###
 POST {{user_route}}/new
-Content-Type: {{content_type}} 
+Content-Type: {{contentType}} 
 
 {
  "firstName": "God'sgift",   
@@ -22,17 +31,17 @@ Content-Type: {{content_type}}
 
 ###
 GET {{user_route}}/all  
-Content-Type: {{content_type}} 
+Content-Type: {{contentType}} 
 Authorization: {{bear_token}}
 
 ###
 GET {{user_route}}/gift@gmail.com
-Content-Type: {{content_type}} 
+Content-Type: {{contentType}} 
 Authorization: {{bear_token}}
 
 ###
 PUT {{user_route}}/giftee@gmail.com
-Content-Type: {{content_type}} 
+Content-Type: {{contentType}} 
 Authorization: {{bear_token}}
 
 {
@@ -41,5 +50,5 @@ Authorization: {{bear_token}}
 
 ###
 DELETE {{user_route}}/gifty@gmail.com
-Content-Type: {{content_type}} 
+Content-Type: {{contentType}} 
 Authorization: {{bear_token}}

@@ -1,29 +1,29 @@
 
-GET http://localhost:3000/api/ping
-Content-Type: application/json 
+GET {{apiHost}}/ping
+Content-Type: {{contentType}} 
 
 ###
-GET http://localhost:3000/api/auth
-Content-Type: application/json 
+GET {{apiHost}}/auth
+Content-Type: {{contentType}} 
 
 ###
-POST http://localhost:3000/api/user/new
-Content-Type: application/json 
+  POST {{apiHost}}/user/new
+Content-Type: {{contentType}} 
 
 {
  "firstName": "God'sgift",  
  "middleName": "Matthew",
  "lastName": "Uko",   
- "email": "example@gmail.com",
+ "email": "john@gmail.com",
  "password": "dhbbdhdhhddh.1234GO!",
  "phone": "+2349071046909"
 }
 
 ###
-POST http://localhost:3000/api/auth
-Content-Type: application/json 
+POST {{apiHost}}/auth
+Content-Type: {{contentType}} 
 
 {  
- "email": "giftee@gmail.com",
- "password": "qwerty1234GO!" 
+ "email": "john@gmail.com",
+ "password": "dhbbdhdhhddh.1234GO!" 
 }

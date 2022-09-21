@@ -13,8 +13,12 @@ export const APP_VAR: {
     env_mode: string;
     serverPort: number;
     allowedURL: Array<string>;
+    httpMethods: Array<string>;
     databaseURI: any; 
     entities: string[];
+    services: string[];
+    permissions: object;
+    roles: object;
     apiPath: string;
     jwt: {
         exp: string;
@@ -31,10 +35,58 @@ export const APP_VAR: {
 } = {
     env_mode: process.env.NODE_ENV || 'development',
     serverPort: 3000,
-    allowedURL: [''],
+    allowedURL: ['http://localhost:3000'],
     entities: ['user', 'farm'],
+    httpMethods: ["GET","POST","DELETE", "PUT"],
     databaseURI: process.env.DATABASE_URL as string,
     apiPath: process.env.API_PATH as string,
+    services: [
+        'user',
+        'farm',
+        'transaction',  // Users transactions
+        'notification', // App notifications
+        'reminder', // Farmer's assist
+        'contents', // App contents
+        'queued_events', // Events Queue ::6
+        ''
+    ],
+    permissions: {
+        farmer: [
+            'read:user',
+            'read:transaction',
+            'update:user',
+            'write:farm',
+            'read:farm',
+            'update:farm',
+            'delete:farm',
+        ],
+        buyer: [
+            'read:user',
+            'read:transaction',
+            'read:notification',
+            'write:transaction',
+            'update:user',
+            'read:farm',
+            'read:farm:all',
+        ],
+        admin: [
+            '*'
+        ]
+    },
+    roles: {
+        ADMIN: {
+            code: 101,
+            name: 'admin'
+        },
+        FARMER: {
+            code: 303,
+            name: 'farmer',
+        },
+        BUYER: {
+            code: 202,
+            name: 'buyer',
+        },
+    },
     jwt: {
         exp: process.env.JWT_EXP as string,
         secret: process.env.JWT_SECRET as string

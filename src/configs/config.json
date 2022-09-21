@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "farmer": [
+      "read:user",
+      "read:transaction",
+      "update:user",
+      "write:farm",
+      "read:farm",
+      "update:farm",
+      "delete:farm"
+    ],
+    "buyer": [
+      "read:user",
+      "read:transaction",
+      "read:notification",
+      "write:transaction",
+      "update:user",
+      "read:farm",
+      "read:farm:all"
+    ],
+    "admin": [
+      "*"
+    ]
+  }
+}

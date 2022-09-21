@@ -62,6 +62,13 @@ export type HttpHeader = {
   authorization?: string;
 } 
 
+export type RequestLoad = {
+    role: string,
+    baseUrl: string,
+    method: string,
+    param: string,
+}
+
 export type HttpRequest = {
     body: any;
     query: object;

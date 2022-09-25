@@ -10,10 +10,7 @@ export const expressHttpAdapter = (controller: any) => {
       baseUrl: req.baseUrl,
       ip: req.ip,
       isAuthenticated: req?.oidc?.isAuthenticated(),
-      user: {
-        email: req?.user?.data?.email,
-        role: req?.user?.data?.role,
-      },
+      user: req?.user,
       method: req.method,
       path: req.path,
       headers: {
@@ -27,6 +24,13 @@ export const expressHttpAdapter = (controller: any) => {
     controller(httpRequest)
       .then((httpResponse: HttpResponse) => { 
         if (httpResponse.next) {
+          const data = httpResponse.next;
+          
+          if (data.constructor === Object) {
+            if ('email' in httpResponse.next) {
+              req.user = httpResponse.next;
+            }
+          }
           return next();
         }
         if (httpResponse) {
@@ -35,6 +39,10 @@ export const expressHttpAdapter = (controller: any) => {
         res.type('json')
         res.status(httpResponse.statusCode).send(httpResponse.body)
       })
-      .catch((e: any) => res.status(500).send({ error: e || 'An unkown error occurred.' }))
+      .catch((e: any) => {
+        console.log({e});
+        
+        res.status(500).send({ error: e || 'An unkown error occurred.' })
+      })
   }
 }

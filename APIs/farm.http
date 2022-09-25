@@ -3,7 +3,7 @@
 @user_route={{api_route}}/user
 @farm_route={{api_route}}/farm
 @content_type=application/json
-@bearer_token=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImV4YW1wbGVAZ21haWwuY29tIiwicm9sZSI6Im5vcm1hbCIsImlhdCI6MTY2MzA4NzU5NiwiZXhwIjoxNjYzMjYwMzk2fQ.H2Zw2MYBQlGAdaz29VL0P9A5AQq1wPvVIsj0D6LTtsU
+@bearer_token={{bearerToken}}
 
 DELETE  {{farm_route}}/eggorand
 Content-Type: {{content_type}}
@@ -15,12 +15,10 @@ Content-Type: {{content_type}}
 Authorization: {{bearer_token}}
 
 {
-    "name": "Millland",
-    "userId": "63207b1e2350b0fb5de816f1",
-    "ownerName": "Uko, God'sgift Matthew",
-    "contact": "+2349071046909",
+    "name": "Eggorand",
     "description": "This is an egg farm",
-    "category": "liv"
+    "category": "liv",
+    "contact": "08097303617"
 }
 
 

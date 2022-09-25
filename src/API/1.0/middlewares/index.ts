@@ -1,4 +1,6 @@
 const { check, validationResult } = require("express-validator");
+import { APP_VAR } from "../../../configs";
+import { isEmail } from "../../../helpers";
 import {
   EerrorMessages,
   EProtocolStatusCode,
@@ -13,6 +15,9 @@ import {
   RequestLoad,
 } from "../../../schemas";
 import { tokenUtil, RBAC, getUserRole } from "../../../utils";
+import Repository from "../repository";
+
+const { getOne } = new Repository('user');
 
 type Err = { value: string; msg: string; param: string; location: string };
 
@@ -62,12 +67,13 @@ export const generateAccessToken = (data: any) => {
   return tokenUtil.generateToken(data);
 };
 
-export const verifyAccessToken = async ({ url, headers }: HttpRequest) => {
+export const verifyAccessToken = async ({ url, headers, baseUrl }: HttpRequest) => {
   try {
     let token;
-    if (url.includes("new")) {
+    const targetUrl = baseUrl.includes('user') && url.includes("new");
+    if (targetUrl) {
       return {
-        next: true
+        next: {}
       };
     }
 
@@ -79,9 +85,21 @@ export const verifyAccessToken = async ({ url, headers }: HttpRequest) => {
       throw EerrorMessages.unAuthorized;
     }
 
-    const decodedToken = tokenUtil.verifyToken(token);
+    const { email, role }: any = tokenUtil.verifyToken(token);
+    const userExist = await getOne({ email });
+
+    if (!userExist) {
+      throw EerrorMessages.notFound;
+    }
+    
+    if (userExist.role !== role) {
+      throw EerrorMessages.falsyUserClaim;
+    }
+
+    delete userExist.password;
+
     return {
-      next: true
+      next: userExist
     };
   } catch (e: any) {
     // TODO: Error logging
@@ -89,7 +107,9 @@ export const verifyAccessToken = async ({ url, headers }: HttpRequest) => {
       headers: {
         contentType: EcontentType.json,
       },
-      statusCode: EProtocolStatusCode.unAuthorized,
+      statusCode: e === EerrorMessages.notFound 
+        ? EProtocolStatusCode.notFound 
+        : EProtocolStatusCode.unAuthorized,
       body: {
         message: EProtocolMessages.failed,
         error: e?.message || e,
@@ -99,35 +119,55 @@ export const verifyAccessToken = async ({ url, headers }: HttpRequest) => {
 };
 
 
-export const grantPermissions = (req: any, res: Res, next: Next) => {
-    try {
-        const { method, baseUrl, url } = req;
+export const persistPermissions = async ({ url, params, user, method, baseUrl, headers }: HttpRequest) => {
+  try {
+        const { mount, isSelfJWT } = new RBAC();
+        const targetUrl = ['/new', '/all'];
+        const sanitizedUrl = targetUrl.includes(url) ? url.replace('/', '') : params.id;
 
-        const { mount } = new RBAC();
-        
-        if (!('role' in req.user.data)) {
-            return res.sendStatus(400);
+        const isValidEmail = isEmail(sanitizedUrl);
+
+        if (!('role' in user)) {  
+            throw EerrorMessages.falsyUserClaim;
         }
-        const { role } = req.user.data;
-        const service = req.baseUrl.split("/").filter(Boolean)[1];
-        // console.log({user: req.user, service, method});
-        // console.log({url, params: req.params, baseUrl, service});
+        const { role, email: decodedEmail } = user;
+        const service = baseUrl.split("/").filter(Boolean)[1];  
         const requestLoad: RequestLoad = {
-            role: role.name,
-            baseUrl: service,
-            method,
-            param: url === '/all' ? url.replace('/','') : req.params.id
+          role,
+          baseUrl: service,
+          method,
+          param: sanitizedUrl
         }
 
-        const is = mount(requestLoad);
-        console.log({is});
-        next()
-    } catch (error) {
-        res.status(500).send({ error: error || 'An unkown error occurred.' });
+        if (isValidEmail) {
+          const email = params.id;
+          const canAccess = isSelfJWT(email, decodedEmail, [
+            APP_VAR.admin.email
+          ]);
+          // console.log({ canAccess, email });
+          
+        }
+
+        const hasMounted = mount(requestLoad);
+        return {
+          next: {}
+        };
+    } catch (e: any) {
+        // TODO: Error logging
+        return {
+          headers: {
+            contentType: EcontentType.json,
+          },
+          statusCode: EProtocolStatusCode.unAuthorized,
+          body: {
+            message: EProtocolMessages.failed,
+            error: e?.message || e,
+          },
+        };
     }
 }
 
-export const grantAdminPermissions = (req: any, res: Res, next: Next) => {
+export const onlyAdminsCanAccess = (req: any, res: Res, next: Next) => {
     if (!('role' in req.user.data)) {
         return res.sendStatus(400);
     }

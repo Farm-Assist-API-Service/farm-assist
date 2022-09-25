@@ -20,6 +20,10 @@ export const APP_VAR: {
     permissions: object;
     roles: object;
     apiPath: string;
+    admin: {
+        password: string;
+        email: string;
+    },
     jwt: {
         exp: string;
         secret: string;
@@ -40,6 +44,10 @@ export const APP_VAR: {
     httpMethods: ["GET","POST","DELETE", "PUT"],
     databaseURI: process.env.DATABASE_URL as string,
     apiPath: process.env.API_PATH as string,
+    admin: {
+        password: process.env.ADMIN_PASSWORD as string,
+        email: process.env.ADMIN_MAIL as string
+    },
     services: [
         'user',
         'farm',
@@ -47,7 +55,7 @@ export const APP_VAR: {
         'notification', // App notifications
         'reminder', // Farmer's assist
         'contents', // App contents
-        'queued_events', // Events Queue ::6
+        'processes', // Events Queue ::6
         ''
     ],
     permissions: {

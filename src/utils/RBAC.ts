@@ -14,9 +14,20 @@ export default class RBAC {
         this.util = this.util.bind(this);
     }
 
-    protected isAuthorized(role: string, permission: string, service: string, param: string) {
+    isSelfJWT(email: string, decodedEmail: string, ignoreList: string[]) {
+        try {
+            if (ignoreList.includes(decodedEmail)) return;
+            if (email !== decodedEmail) throw {
+                error: 'ERR::UNAUTHORIZED_ACCESS',
+                reason: 'You are not allowed'
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    protected isAuthorized(role: string, permission: string, service: string, param: string) {  
         const action = `${permission}:${service}${param}`; 
-        console.log({ role, permission, service , action, param}); 
         if (!(role in this.permissions)) return 'ROLE_NOT_IN_SCOPE';
         return this.permissions[role].includes('*') && true || this.permissions[role].includes(action)
             ? true
@@ -35,11 +46,13 @@ export default class RBAC {
         return 'ACTION_NOT_IN_SCOPE';
     }
 
+
     mount(requestLoad: RequestLoad) {
         try {
             const {
                 role, method, baseUrl, param
             } = requestLoad;
+
             const manyParam = 'all';
             const { sanitizeUrl, isParam, isValidString } = this.util();
             const permission = this.convertHttpMethodToPermission(method);
@@ -48,14 +61,12 @@ export default class RBAC {
                 error: 'ERR::UNSPECIFIED_USER',
                 reason: 'User has no role'
             }
-            console.log({role, permission});
 
             const data = {
                 role: isValidString(role, 'user role'),
                 service: sanitizeUrl(baseUrl),
                 param: isParam(param)
             }
-            console.log({role, permission});
 
             const isManyParamQuery = manyParam === data.param;
             const pluralizedServiceStr = data.param !== manyParam ? data.service : data.service+'s';
@@ -63,13 +74,12 @@ export default class RBAC {
                 error: 'ERR::INVALID_OPERATION',
                 reason: `This service does not support mutiple ${permission} operations.`
             }
-            const hasAccess = this.isAuthorized(permission, isManyParamQuery ? ':'+data.param : '', data.role, data.service );
+            const hasAccess = this.isAuthorized(data.role, permission, data.service, isManyParamQuery ? ':'+data.param : '');
             if (!hasAccess) throw {
                 error: 'ERR::UNAUTHORIZED_ACCESS',
-                reason: `${data.role} is unauthorized to ${permission} ${pluralizedServiceStr}`
+                reason: 'You are not allowed'
+                // reason: `${data.role} is unauthorized to ${permission} ${pluralizedServiceStr}`
             }
-            console.log({hasAccess});
-            
             return hasAccess;
                 
         } catch (error) {

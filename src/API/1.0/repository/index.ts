@@ -41,7 +41,7 @@ export default class Repository {
             const count = responseData.length;
             return {
                 count,
-                [this.entity]: !count ? EerrorMessages.noUser : responseData,
+                [this.entity]: !count ? [] : responseData,
             };
         } catch (error) {
             throw error;
@@ -72,7 +72,8 @@ export default class Repository {
         try {
             const modifyEntity = prismaAdapter.updateMany(this.entity);
             const responseData = await modifyEntity(query, data, options);
-            return responseData;
+            const modifiedData = await this.getOne({ email: data.email });
+            return modifiedData;
         } catch (error) {
             throw error;
         }

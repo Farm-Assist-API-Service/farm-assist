@@ -75,10 +75,7 @@ export type HttpRequest = {
     params: any;
     baseUrl: string;
     url: string;
-    user: {
-        email: string;
-        role: { code: string, name: string };
-    },
+    user: any,
     isAuthenticated: any;
     ip: string;
     method: string;
@@ -91,6 +88,7 @@ export type HttpResponse = {
   body: object;
   statusCode: number;
   next?: any;
+  user?: { email: string; role: string };
 }
 
 export type Interactors = {

@@ -1,8 +1,10 @@
+import { APP_VAR } from "../../../configs";
 import { HttpRequest, EcontentType, EProtocolStatusCode, EProtocolMessages, EerrorMessages, User } from "../../../schemas";
 import { hashUtil, tokenUtil } from "../../../utils/helpers";
 import Repository from "../repository";
 
 const { create, getAll, getOne, modifyOne, delOne } = new Repository('user');
+const adminMail = APP_VAR.admin.email;
 
 export const createUser = async (request: HttpRequest) => {
     try {
@@ -12,16 +14,17 @@ export const createUser = async (request: HttpRequest) => {
             count,
             user
         } = await getAll(['sourceInfo', 'farm']);
-        
 
-        
-        if (!count) {
-            await createAdmin();
+        const adminExist = await getOne({ email: adminMail });
+
+        if (!adminExist) {
+            const adminData = await createAdmin();
+            const hasCreatedAdmin = await create(adminData);
+            console.log('Created admin');
         }
         
         const thisUser = (user: User) => user.email === body.email;
         emailExist = user.find(thisUser);
-        console.log({emailExist});
         
         // emailExist = await getOne({ email: body.email }, ['sourceInfo']);
 
@@ -35,7 +38,9 @@ export const createUser = async (request: HttpRequest) => {
         const modifiedData = { ...othersFields };
         modifiedData["password"] = hashedPassword;
         const data = await create(modifiedData);
-
+        delete data.password;
+        delete data.id;
+        
         return {
             headers: {
                 contentType: EcontentType.json,
@@ -281,6 +286,7 @@ export const modifyUser = async (request: HttpRequest) => {
 
         const data = await modifyOne(query, modifiedData);
         delete data.password;
+        delete data.id;
 
         return {
             headers: {
@@ -348,6 +354,13 @@ const isEmail = {
 }
 
 const createAdmin = async () => {
-        console.log('Created admin');
-        
+    const hashedPassword = await hashUtil.generateHash(APP_VAR.admin.password)
+    return {
+        "firstName": "Farm",   
+        "middleName": "Assist",       
+        "lastName": "Admin",
+        "email": adminMail,
+        "password": hashedPassword,
+        "role": "admin"
+    }
 }

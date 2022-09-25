@@ -40,6 +40,7 @@ export enum EerrorMessages {
     unRecogEntity = "Unrecognized entity",
     unProcessableData = "Unprocessable data entry",
     farmExist = "Sorry! A farm is already registered with this name",
+    falsyUserClaim = "Unrecognized access claim. Try re-authorizing"
 }
 
 export enum EUserRole {

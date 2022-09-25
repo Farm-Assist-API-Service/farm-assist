@@ -22,7 +22,7 @@ model User {
   gender     String?
   password   String
   phone      String?
-  role       String       @default("normal")
+  role       String       @default("farmer")
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
   sourceInfo SourceInfo[]
@@ -43,17 +43,19 @@ model Farm {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   banned      Boolean   @default(false)
   isVerified  Boolean   @default(false)
-  user        User      @relation(references: [id], fields: [userId], onDelete: Cascade)
-  userId      String    @unique @db.ObjectId
-  slug        String?    @unique
+  user        User      @relation(references: [id], fields: [ownerId], onDelete: Cascade)
+  ownerId     String    @unique @db.ObjectId
+  slug        String?   @unique
   name        String    @unique
-  ownerName   String
+  ownerNames  String
   contact     String
   // size        Int
   products    Product[]
   address     Address?
   description String
   category    String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Address {

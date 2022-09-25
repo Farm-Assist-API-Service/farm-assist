@@ -7,14 +7,17 @@ export const farmRules = {
       .isEmpty()
       .isLength({ min: 3 })
       .withMessage("Farm name must have more than 3 characters"),
-    check("ownerName", "Please enter your names to proceed")
-      .not()
-      .isEmpty()
-      .isString(),
+    // check("ownerName", "Please enter your names to proceed")
+    //   .not()
+    //   .isEmpty()
+    //   .isString(),
     check("contact", "Please enter your farm contact detail to proceed")
+      .optional()
       .not()
       .isEmpty()
-      .isString(),
+      .isString()
+      .isMobilePhone('en-NG')
+      .withMessage("Mobile number is invalid"),
     check("description", "Please describe your farm to proceed")
       .not()
       .isEmpty()

@@ -1,7 +1,8 @@
 
 @user_route={{apiHost}}/user
 @contentType=application/json
-@bear_token=Bearer {{login.response.body.data.token}}
+# @bearer_token=Bearer {{login.response.body.data.token}}
+@bearer_token={{bearerToken}}
 
 ###
 GET {{apiHost}}/ping
@@ -13,8 +14,17 @@ POST {{apiHost}}/auth
 Content-Type: {{contentType}} 
 
 {  
- "email": "john@gmail.com",
- "password": "dhbbdhdhhddh.1234GO!" 
+ "email": "gifty@gmail.com",
+ "password": "abc1234GO!" 
+} 
+
+### Admin
+POST {{apiHost}}/auth
+Content-Type: {{contentType}} 
+
+{  
+ "email": "admin@farmassist.ng",
+ "password": "abc1234GO@" 
 }
 
 ###
@@ -23,32 +33,32 @@ Content-Type: {{contentType}}
 
 {
  "firstName": "God'sgift",   
- "middleName": "Matthew",   
+"middleName": "Matthew",       
  "lastName": "Uko",
  "email": "gifty@gmail.com",
  "password": "abc1234GO!"
 }
 
 ###
-GET {{user_route}}/all  
+GET {{user_route}}/all
 Content-Type: {{contentType}} 
-Authorization: {{bear_token}}
+Authorization: {{bearer_token}}
 
 ###
-GET {{user_route}}/gift@gmail.com
+GET {{user_route}}/gifty@gmail.com
 Content-Type: {{contentType}} 
-Authorization: {{bear_token}}
+Authorization: {{bearer_token}}
 
 ###
-PUT {{user_route}}/giftee@gmail.com
+PUT {{user_route}}/gifteee@gmail.com
 Content-Type: {{contentType}} 
-Authorization: {{bear_token}}
+Authorization: {{bearer_token}}
 
 {
-    "email": "giftee@gmail.com"
+ "email": "gifteee@gmail.com"
 }
 
 ###
 DELETE {{user_route}}/gifty@gmail.com
 Content-Type: {{contentType}} 
-Authorization: {{bear_token}}
+Authorization: {{bearer_token}}

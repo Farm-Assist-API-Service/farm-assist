@@ -6,7 +6,7 @@ import {
   getAFarm,
   delAFarm
 } from "../controllers/farm";
-import { rulesProcessor } from "../middlewares";
+import { persistPermissions, rulesProcessor } from "../middlewares";
 
 export default function (httpAdapter: Function) {
   const router: Router = express.Router();
@@ -15,14 +15,21 @@ export default function (httpAdapter: Function) {
     .post(
       farmRules.creation,
       rulesProcessor,
+      httpAdapter(persistPermissions),
       httpAdapter(createFarm)
     );
 
   // router.route("/all").get(httpAdapter(getAllUsers));
 
-  router.route("/:name")
-    .get(httpAdapter(getAFarm))
-    .delete(httpAdapter(delAFarm))
+  router.route("/:id")
+    .get(
+      httpAdapter(persistPermissions),
+      httpAdapter(getAFarm)
+    )
+    .delete(
+      httpAdapter(persistPermissions),
+      httpAdapter(delAFarm)
+    )
     
   return router;
 }

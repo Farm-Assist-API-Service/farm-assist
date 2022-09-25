@@ -68,8 +68,6 @@ export const prismaAdapter = {
                 const response = await prisma[entity].delete({
                     where: query
                 });
-                console.log({response});
-                
                 return response;
             } catch (error) {
                 console.log(error);

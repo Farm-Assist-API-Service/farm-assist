@@ -8,6 +8,8 @@ import { expressHttpAdapter } from "./adapters/express.adapter";
 // import { auth, requiresAuth } from "express-openid-connect";
 import { generateAccessToken, verifyAccessToken } from "./API/1.0/middlewares";
 
+
+console.log({APP_VAR})
 const httpServer = () => {
   const PORT = APP_VAR.serverPort;
   const apiPath = APP_VAR.apiPath; 

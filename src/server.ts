@@ -20,7 +20,7 @@ const httpServer = () => {
   app.use(express.json());
   app.use(cors());
 
-  app.use(cors(corsOption));
+  // app.use(cors(corsOption));
 
   const config: any = {
     clientID: APP_VAR.OAuth.clientID,

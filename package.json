@@ -12,8 +12,8 @@
   "scripts": {
     "dev": "ts-node-dev --respawn src/server.ts",
     "build": "tsc",
-    "postinstall": "npm install -g typescript && tsc && node build/server.js",
-    "start": "node build/server.js",
+    "postinstall": "npm install -g typescript",
+    "start": "tsc && node build/server.js",
     "pm2-prod": "tsc && pm2 start pm2.config.js",
     "pm2-dev": "tsc && pm2-dev start pm2.config.js"
   },

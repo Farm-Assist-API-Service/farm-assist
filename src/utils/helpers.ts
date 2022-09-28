@@ -1,7 +1,9 @@
 import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
 import { APP_VAR } from "../configs";
+import { User } from "../schemas";
 const { jwt, hashing } = APP_VAR;
+
 
 export const controllerInterface = () => {
     
@@ -40,3 +42,10 @@ export const tokenUtil = {
         }
     }
 } 
+
+export const exclude = <User, Key extends keyof User> (user: User, ...keys: Key[]): Omit<User, Key> => {
+  for (let key of keys) {
+    delete user[key]
+  }
+  return user
+}

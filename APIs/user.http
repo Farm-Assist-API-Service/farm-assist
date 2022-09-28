@@ -15,7 +15,7 @@ Content-Type: {{contentType}}
 
 {  
  "email": "gifty@gmail.com",
- "password": "abc1234GO!" 
+ "password": "{{user_password}} "
 } 
 
 ### Admin
@@ -24,7 +24,7 @@ Content-Type: {{contentType}}
 
 {  
  "email": "admin@farmassist.ng",
- "password": "abc1234GO@" 
+ "password": "{{admin_pass}}" 
 }
 
 ###

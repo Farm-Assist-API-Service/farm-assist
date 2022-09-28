@@ -4,7 +4,7 @@ This is a REST API service for Farm Assist application. It is an agricultural da
 
 ## Api documentation
 
-[Checkout](https://farm-assist-endpoint.herokuapp.com/api-doc)
+[Checkout](https://farm-assist-endpoint.herokuapp.com/api/docs)
 
 ## Authors
 

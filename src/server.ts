@@ -66,7 +66,7 @@ if (
   // app.use(middlewares(PORT));
   const apiSpecs = swaggerJsDoc(swaggerOptions);
   // ROUTES
-  app.use('/api-doc', swaggerUI.serve, swaggerUI.setup(apiSpecs));
+  app.use(`${apiPath}/docs`, swaggerUI.serve, swaggerUI.setup(apiSpecs));
   app.use(`${apiPath}/auth`, authRoute(expressHttpAdapter));
   app.use(`${apiPath}/user`, expressHttpAdapter(verifyAccessToken), userRoute(expressHttpAdapter));
   app.use(`${apiPath}/farm`, expressHttpAdapter(verifyAccessToken), farmRoute(expressHttpAdapter));

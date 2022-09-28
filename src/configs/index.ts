@@ -11,6 +11,7 @@ export const web3VARIABLES = {}
 // App configuration
 export const APP_VAR: {
     env_mode: string;
+    host: string;
     serverPort: number;
     allowedURL: Array<string>;
     httpMethods: Array<string>;
@@ -38,6 +39,7 @@ export const APP_VAR: {
     }
 } = {
     env_mode: process.env.NODE_ENV || 'development',
+    host: process.env.HOST as string,
     serverPort: parseInt(process.env.PORT as string, 10),
     allowedURL: ['http://localhost:3000'],
     entities: ['user', 'farm'],

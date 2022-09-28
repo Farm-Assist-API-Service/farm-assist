@@ -1,1 +1,1 @@
-web: yarn start  
+web: yarn pm2-dev 

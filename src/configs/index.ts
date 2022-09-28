@@ -38,7 +38,7 @@ export const APP_VAR: {
     }
 } = {
     env_mode: process.env.NODE_ENV || 'development',
-    serverPort: parseInt((process.env.SERVER_PORT as string || process.env.PORT as string), 10),
+    serverPort: parseInt(process.env.PORT as string, 10),
     allowedURL: ['http://localhost:3000'],
     entities: ['user', 'farm'],
     httpMethods: ["GET","POST","DELETE", "PUT"],

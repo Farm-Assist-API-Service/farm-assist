@@ -1,1 +1,1 @@
-web: yarn pm2-dev 
+web: node ./build/server.js

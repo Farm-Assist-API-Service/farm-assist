@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn src/server.ts",
     "build": "tsc",
-    "postinstall": "npm install -g yarn && yarn add typescript && yarn pm2-dev",
+    "postinstall": "npm install -g yarn typescript && tsc && yarn start",
     "start": "node build/server.js",
     "pm2-prod": "tsc && pm2 start pm2.config.js",
     "pm2-dev": "tsc && pm2-dev start pm2.config.js"

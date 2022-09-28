@@ -9,14 +9,14 @@
   "scripts": {
     "dev": "ts-node-dev --respawn src/server.ts",
     "build": "tsc",
-    "postinstall": "npm install -g yarn && yarn add typescript",
+    "postinstall": "npm install -g yarn",
     "start": "tsc && node build/server.js",
     "pm2-prod": "tsc && pm2 start pm2.config.js",
     "pm2-dev": "tsc && pm2-dev start pm2.config.js"
   },
-"engine": {
-	"node": "18.9.0"
-},
+  "engine": {
+    "node": "18.9.0"
+  },
   "dependencies": {
     "@prisma/client": "^4.3.1",
     "bcrypt": "^5.0.1",

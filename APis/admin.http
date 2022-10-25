@@ -1,0 +1,13 @@
+###
+### AUTH ENDPOINT (LOGIN)
+###
+# @name adminLogin
+@adminToken = {{adminLogin.response.body.data.access_token}}
+
+POST {{baseUrl}}/auth
+Content-Type: {{contentType}}
+
+{
+  "phone": "09016000000",
+  "password": "12345678"
+}

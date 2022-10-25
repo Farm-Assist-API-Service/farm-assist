@@ -1,0 +1,14 @@
+{
+  "rest-client.environmentVariables": {
+    "$shared": {
+      "accessToken": "your-access-token",
+      "contentType": "application/json",
+    },
+    "sandbox": {
+      "baseUrl": "http://localhost:3000/api/v1",
+    },
+    "production": {
+      "baseUrl": "http://localhost:3000/api/v1",
+    }
+  }
+}

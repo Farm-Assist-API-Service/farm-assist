@@ -1,0 +1,34 @@
+###
+### AUTH ENDPOINT (LOGIN)
+###
+# @name login
+@loginToken = {{login.response.body.data.access_token}}
+
+
+POST {{baseUrl}}/auth
+Content-Type: {{contentType}}
+
+{
+  "identifier": "godsgiftuko@gmail.com",
+  "password": "12345678"
+}
+
+###
+### FARMER ENDPOINT 
+###
+# @name reg
+@regToken = {{reg.response.body.access_token}}
+
+POST {{baseUrl}}/user/new
+Content-Type: {{contentType}}
+
+{
+  "firstName": "God'sgift",
+  "middleName": "Matthew",
+  "lastName": "Uko",
+  "email": "godsgiftuko@gmail.com",
+  "phone": "09066632222",
+  "password": "12345678",
+  "role": "FARMER",
+  "gender": "MALE"
+}

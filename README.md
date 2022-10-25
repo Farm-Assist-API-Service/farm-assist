@@ -36,7 +36,7 @@ $ yarn start:prod
 | Field         | Description                                                       |
 | :------------ | :---------------------------------------------------------------- |
 | `PORT`        | **Required**. Http server port (Check example.env for more info.) |
-| `API_VERSION` | **Required**. API version (Check example.env for more info.)      |
+| `API_VERSION` | **Required**. Api version (Check example.env for more info.)      |
 
 ## Authorization
 
@@ -92,6 +92,86 @@ Many API endpoints return the JSON representation of the resources created or ed
   "statusCode": 401,
   "message": "Unauthorized"
 }
+```
+
+## User Endpoint
+
+This endpoint manages user entity.
+
+```http
+POST /user/new
+```
+
+```javascript
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "firstName": string,
+  "middleName": string,
+  "lastName": string,
+  "email": string,
+  "phone": string,
+  "password": string,
+  "role": string,
+  "gender": string
+}
+```
+
+| Field        | Description                                                       | Enum          |
+| :----------- | :---------------------------------------------------------------- | :------------ |
+| `firstName`  | **Required**. User first name. <String>                           |
+| `middleName` | **Required**. User middle name. <String>                          |
+| `lastName`   | **Required**. User last name. <String>                            |
+| `email`      | **Required**. User email. <String>                                |
+| `phone`      | **Required**. User phone. Must be 11 characters long <String>     |
+| `password`   | **Required**. User password. Min. length of 8 characters <String> |
+| `gender`     | **Required**. User gender <String>                                | MALE, FEMALE  |
+| `role`       | **Required**. User role <String>                                  | ADMIN, FARMER |
+
+## Responses
+
+### Success
+
+```javascript
+{
+  "statusCode": 201,
+  "user": {
+    "firstName": string,
+    "middleName": string,
+    "lastName": string,
+    "email": string,
+    "phone": string,
+    "gender": string,
+    "role": string,
+    "id": string,
+    "isVerified": boolean,
+    "banned": boolean,
+    "createdAt": date,
+    "updatedAt": date
+  },
+  "access_token": string
+}
+```
+
+### Duplicate
+
+```javascript
+{
+  "statusCode": 409,
+  "message": "Sorry! This mobile number is already registered",
+  "error": "Conflict"
+}
+
+```
+
+```javascript
+{
+  "statusCode": 409,
+  "message": "Sorry! This email address is already registered",
+  "error": "Conflict"
+}
+
 ```
 
 ## Status Codes

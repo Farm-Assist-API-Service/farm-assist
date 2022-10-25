@@ -9,7 +9,7 @@ POST {{baseUrl}}/auth
 Content-Type: {{contentType}}
 
 {
-  "identifier": "godsgiftuko@gmail.com",
+  "identifier": "09077777777",
   "password": "12345678"
 }
 
@@ -27,7 +27,7 @@ Content-Type: {{contentType}}
   "middleName": "Matthew",
   "lastName": "Uko",
   "email": "godsgiftuko@gmail.com",
-  "phone": "09066632222",
+  "phone": "09077777777",
   "password": "12345678",
   "role": "FARMER",
   "gender": "MALE"

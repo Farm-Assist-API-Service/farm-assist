@@ -1,22 +1,45 @@
 import {
   Injectable,
   NotFoundException,
+  HttpException,
   ConflictException,
   Logger,
+  HttpStatus,
 } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import {
+  Between,
+  Brackets,
+  FindManyOptions,
+  FindOneOptions,
+  ILike,
+  In,
+  IsNull,
+  Like,
+  MoreThan,
+  Not,
+  Repository,
+  SelectQueryBuilder,
+  getManager,
+  UpdateResult,
+  getRepository,
+} from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { User } from './user.entity';
-import { CreateUserDto } from './user.dto';
-import { E_API_ERR, E_USER_ROLE } from 'src/core/schemas';
+import { User } from './entities/user.entity';
+import { CreateUserDto } from './dto/CreateUserDto';
+import { MESSAGE, ROLE } from './enums';
 import { ADMIN_INFO } from 'src/core/constants';
+import { JwtStrategy } from '../auth/strategies/jwt.strategy';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UserService {
   private logger = new Logger(UserService.name);
   constructor(
-    private jwtTokenService: JwtService,
-    private configService: ConfigService,
+    private readonly configService: ConfigService,
+    @InjectRepository(User)
+    private readonly usersRepo: Repository<User>,
   ) {}
 
   private get getAdminInfo() {
@@ -29,17 +52,18 @@ export class UserService {
       !ADMIN_INFO.password ||
       !ADMIN_INFO.role
     ) {
-      throw new Error(E_API_ERR.missingAdmin);
+      throw new Error(MESSAGE.missingAdmin);
     }
     return { ...ADMIN_INFO };
   }
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<User> {
     try {
-      const users = await this.getAllUsers();
+      const newUser: any = { ...createUserDto };
+      const users = await this.getAll();
 
       // Create Admin
-      const findAdmin = (user) => user.role === E_USER_ROLE.ADMIN;
+      const findAdmin = (user) => user.role === ROLE.ADMIN;
       const adminExist = users.find(findAdmin);
 
       if (!adminExist) {
@@ -48,85 +72,102 @@ export class UserService {
       }
 
       // Check for duplicates
-      const { phone, email } = createUserDto;
+      const { phone, email } = newUser;
 
       //TODO: Refactor me
       const findPhone = (user: User) => user.phone === phone;
       const phoneExist = users.find(findPhone);
 
       if (phoneExist) {
-        throw new ConflictException(E_API_ERR.phoneExist);
+        throw new ConflictException(MESSAGE.phoneExist);
       }
 
       const findEmail = (user: User) => user.email === email;
       const emailExist = users.find(findEmail);
 
       if (emailExist) {
-        throw new ConflictException(E_API_ERR.emailExist);
+        throw new ConflictException(`Sign Up failed - ${MESSAGE.emailExist}`);
       }
 
-      const user = User.create({ ...createUserDto });
+      // Add OTP
+      newUser.otp = this.generateOTP;
+
+      const user = User.create({ ...newUser });
 
       await user.save();
       delete user.password;
 
-      // Generate JWT
-      const payload = {
-        expiresIn: this.configService.get('JWT_EXPIRES_IN'),
-        phone: user.phone,
-        sub: user.id,
-      };
-      const access_token = this.jwtTokenService.sign(payload);
-
-      return {
-        user,
-        access_token,
-      };
+      return user;
     } catch (error) {
       throw error;
     }
   }
 
-  async getUserById(id: string): Promise<User> {
-    try {
-      const user = await this.findById(id);
+  private get generateOTP() {
+    return Math.floor(1000 + Math.random() * 9000);
+  }
 
-      delete user.password;
+  async getUserById(id: number): Promise<User> {
+    return await this.findById(id);
+  }
+
+  protected async findById(id: number): Promise<User> {
+    return await this.usersRepo.findOne({ where: { id } });
+  }
+
+  async getByPhone(phone: string): Promise<User> {
+    return await this.usersRepo.findOne({
+      where: { phone },
+    });
+  }
+
+  async getByEmail(email: string): Promise<User> {
+    return await this.usersRepo.findOne({
+      where: { email },
+    });
+  }
+
+  async getAll(): Promise<User[]> {
+    return await this.usersRepo.find();
+  }
+
+  async save(user: User): Promise<User> {
+    return await this.usersRepo.save(user);
+  }
+
+  async updateUser(id: number, updateData: Partial<User>): Promise<User> {
+    try {
+      let user = await this.findById(id);
+      if (!user) {
+        throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
+      }
+      const userUpdateData = { ...user, ...updateData };
+      user = await this.usersRepo.save(userUpdateData);
       return user;
     } catch (error) {
-      throw new NotFoundException(E_API_ERR.userNotFound);
+      Logger.error(`User Not Updated: ${JSON.stringify(error.message)}`);
+      throw new HttpException(
+        'User Not Updated',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
-  protected async findById(id: string) {
+  async update(id: number, updateData: Partial<User>): Promise<UpdateResult> {
     try {
-      return await User.findOne({ where: { id } });
+      const user = await this.findById(id);
+      if (!user) {
+        throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
+      }
+      const userUpdateData = { ...user, ...updateData };
+      console.log({ userUpdateData });
+      return await this.usersRepo.update(id, userUpdateData);
     } catch (error) {
-      throw new NotFoundException(E_API_ERR.userNotFound);
+      Logger.error(`User Not Updated: ${JSON.stringify(error.message)}`);
+      throw new HttpException(
+        'User Not Updated',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-  }
-
-  async getUserByPhone(phone: string) {
-    try {
-      return await User.findOne({
-        where: { phone },
-      });
-    } catch (error) {
-      throw new NotFoundException(E_API_ERR.userNotFound);
-    }
-  }
-
-  async getUserByEmail(email: string) {
-    try {
-      return await User.findOne({
-        where: { email },
-      });
-    } catch (error) {
-      throw new NotFoundException(E_API_ERR.userNotFound);
-    }
-  }
-
-  async getAllUsers() {
-    return await User.find();
   }
 }

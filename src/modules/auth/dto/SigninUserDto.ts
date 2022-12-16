@@ -10,9 +10,8 @@ import {
   IsPhoneNumber,
   IsBoolean,
 } from 'class-validator';
-import { E_USER_ROLE } from 'src/core/schemas';
 
-export class LoginUserDto {
+export class SigninUserDto {
   @IsNotEmpty()
   @IsString()
   identifier: string;

@@ -8,9 +8,10 @@ import {
   IsOptional,
   IsNumberString,
   IsPhoneNumber,
+  IsNumber,
   IsBoolean,
 } from 'class-validator';
-import { E_USER_ROLE, E_USER_GENDER } from '../../core/schemas';
+import { ROLE, GENDER } from 'src/modules/user/enums';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -32,11 +33,11 @@ export class CreateUserDto {
   @IsEmail()
   email: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsPhoneNumber('NG')
   @IsNumberString()
   @Length(11, 11)
-  phone: string;
+  phone?: string;
 
   @IsNotEmpty()
   @IsString()
@@ -44,18 +45,18 @@ export class CreateUserDto {
   password: string;
 
   @Matches(
-    `^${Object.values(E_USER_GENDER)
+    `^${Object.values(ROLE)
       .filter((v) => typeof v !== 'number')
       .join('|')}$`,
     'i',
   )
-  gender: E_USER_GENDER;
+  readonly role: ROLE = ROLE.USER;
 
-  @Matches(
-    `^${Object.values(E_USER_ROLE)
-      .filter((v) => typeof v !== 'number')
-      .join('|')}$`,
-    'i',
-  )
-  role: E_USER_ROLE;
+  @IsOptional()
+  @IsString()
+  readonly inviteCode?: string;
+
+  @IsOptional()
+  @IsNumber()
+  readonly regionId: number;
 }

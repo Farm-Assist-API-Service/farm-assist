@@ -4,14 +4,14 @@ import { rateLimit } from 'express-rate-limit';
 import { Logger, ValidationPipe, HttpStatus } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
-import { E_API_ERR } from './core/schemas';
+import { MESSAGE } from 'src/core/enums';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
-  app.setGlobalPrefix(`api/v${configService.get('API_VERSION')}`);
+  // app.setGlobalPrefix(`api/v${configService.get('API_VERSION')}`);
 
-  const port = configService.get('SERVER_PORT') || 3000;
+  const port = configService.get('SERVER_PORT') || 7000;
   const nodeEnv = configService.get('NODE_ENV');
 
   // -- Helmet
@@ -31,7 +31,7 @@ async function bootstrap() {
       legacyHeaders: false, // Disable the `X-RateLimit-*` headers,
       skipSuccessfulRequests: false, // The counting will skip all successful requests and just count the errors. Instead of removing rate-limiting, it's better to set this to true to limit the number of times a request fails. Can help prevent against brute-force attacks
       message: {
-        message: `${E_API_ERR.manyRequest} Try again in 5 minutes.`,
+        message: `${MESSAGE.manyRequest} Try again in 5 minutes.`,
         statusCode: HttpStatus.TOO_MANY_REQUESTS,
       },
     }),

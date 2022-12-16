@@ -10,18 +10,22 @@ import {
   JoinColumn,
   OneToMany,
   PrimaryGeneratedColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { E_USER_ROLE, E_USER_GENDER } from 'src/core/schemas';
+import { ROLE, GENDER } from '../enums';
 import { PASSWORD_HASH_SALT } from 'src/core/constants';
 
 @Entity('users')
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: number;
 
   @Column({ default: false })
-  isVerified: boolean;
+  verifiedByEmail: boolean;
+
+  @Column({ default: null })
+  otp: string;
 
   @Column({ default: false })
   banned: boolean;
@@ -38,7 +42,7 @@ export class User extends BaseEntity {
   @Column({ unique: true })
   email: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, default: null })
   phone: string;
 
   @Column()
@@ -46,17 +50,18 @@ export class User extends BaseEntity {
 
   @Column({
     type: 'enum',
-    enum: E_USER_GENDER,
-    nullable: true
+    enum: GENDER,
+    nullable: true,
+    default: null,
   })
-  gender: E_USER_GENDER;
+  gender: GENDER;
 
   @Column({
     type: 'enum',
-    enum: E_USER_ROLE,
-    default: E_USER_ROLE.FARMER,
+    enum: ROLE,
+    default: ROLE.USER,
   })
-  role: E_USER_ROLE;
+  role: ROLE;
 
   // @OneToMany(() => Farm, (farm) => wallet.owner)
   // @JoinColumn({ name: 'owner_name' })
@@ -69,6 +74,10 @@ export class User extends BaseEntity {
   @Column()
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column()
+  @DeleteDateColumn()
+  deletedAt: Date;
 
   @BeforeInsert()
   async hashPassword() {

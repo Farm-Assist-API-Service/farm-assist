@@ -44,7 +44,6 @@ export type HttpResponse = {
 };
 
 export type JwtPayload = {
-  expiresIn: string;
   sub: number;
-  phone: string;
+  identifier: string;
 };

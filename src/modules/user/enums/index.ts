@@ -1,16 +1,4 @@
-export enum E_API_STATUS_MESSAGE {
-  ok = 'Success!',
-  created = 'Created!',
-  deleted = 'Deleted!',
-  updated = 'Updated!',
-  failed = 'Failed!',
-}
-
-export enum E_CONTENT_TYPE {
-  json = 'application/json',
-}
-
-export enum E_API_ERR {
+export enum MESSAGE {
   ERR_CODE_DUPLICATE = 'ERR:DUPLICATE',
   ERR_CODE_NOT_FOUND = 'ERR:NOT_FOUND',
   ERR_CODE_INCORRECT_LOGIN = 'ERR:INCORRECT_LOGIN',
@@ -28,18 +16,18 @@ export enum E_API_ERR {
   invalidData = 'Sorry! Request is not valid',
   unRecogEntity = 'Unrecognized entity',
   unProcessableData = 'Unprocessable data entry',
-  farmExist = 'Sorry! This name is unavailable',
   farmNotFound = 'Farm not found',
   falsyAccessClaim = 'Unrecognized access claim. Try re-authorizing',
   missingAdmin = 'Please set admin credentials in .env to proceed',
 }
 
-export enum E_USER_ROLE {
+export enum ROLE {
   ADMIN = 'ADMIN',
   FARMER = 'FARMER',
+  USER = 'USER',
 }
 
-export enum E_USER_GENDER {
+export enum GENDER {
   MALE = 'MALE',
   FEMALE = 'FEMALE',
 }

@@ -1,0 +1,20 @@
+@host = http://localhost:3000;
+
+
+#Health Check
+http://localhost:3000/health
+Content-Type: application/json
+
+
+### Signup
+POST http://localhost:3000/auth/signup
+Content-Type: application/json
+
+{
+  "firstName": "God'sgift",
+  "lastName": "Uko",
+  "email": "godsgiftuko8@gmail.com",
+  "password": "123456abcABC@",
+  "regionId": 16,
+  "source": "Development env"
+}

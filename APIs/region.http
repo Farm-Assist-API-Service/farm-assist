@@ -1,0 +1,23 @@
+#Health Check
+http://localhost:3000/health
+Content-Type: application/json
+
+
+### Create Region
+POST http://localhost:3000/region
+Content-Type: application/json
+
+{
+  "name": "UK",
+  "paymentProvider": "Paystack"
+}
+
+# {
+#   "name": "Ghana",
+#   "regionDetails": {
+#     "flagPng": "http://flagPng.png",
+#     "code": "GH",
+#     "currency": "Ghc",
+#     "demonym": "Ghanian"
+#   }
+# }

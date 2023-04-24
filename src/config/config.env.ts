@@ -76,14 +76,14 @@ export class EnvConfig {
   static getDefaultObject(): EnvConfig {
     const obj = new EnvConfig();
     obj.NODE_ENV = 'development';
-    obj.APP_EMAIL = 'admin@auterah.com';
-    obj.APP_NAME = 'Auterah API serivce';
+    obj.APP_EMAIL = 'admin@farmassist.com';
+    obj.APP_NAME = 'Farm Assist serivce';
     obj.PORT = 3000;
     obj.TYPEORM_TYPE = 'auto';
     obj.TYPEORM_HOST = 'localhost';
     obj.TYPEORM_USERNAME = 'gu';
     obj.TYPEORM_PASSWORD = 'postgres';
-    obj.TYPEORM_DATABASE = '';
+    obj.TYPEORM_DATABASE = 'farm_assist';
     obj.TYPEORM_PORT = 5432;
     obj.TYPEORM_LOGGING = true;
     obj.HEALTH_CHECK_DATABASE_TIMEOUT_MS = 3000;

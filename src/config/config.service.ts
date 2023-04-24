@@ -22,8 +22,6 @@ export class ConfigService {
       throw new Error('Invalid env.');
     }
 
-    console.log({ TYPEORM_DATABASE: env });
-
     if (env.NODE_ENV === 'development' || env.NODE_ENV === 'test') {
       if (!env.JWT_SECRET) {
         env.JWT_SECRET = 'default';

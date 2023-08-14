@@ -19,7 +19,8 @@ export class CreateProfileInformationInput
   implements Partial<ProfileInformation>
 {
   @IsEnum(ProfileType)
-  readonly profileType: ProfileType;
+  @IsOptional()
+  readonly profileType?: ProfileType = ProfileType.REGULAR;
 
   @IsString()
   phone: string;

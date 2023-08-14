@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { HttpStatus, Logger } from '@nestjs/common';
 import { axios } from 'src/utils/helpers/axios';
 import {
   RegionInfoType,
@@ -30,12 +30,12 @@ export class RestcountriesService implements SetRegionService {
         },
       };
 
-      const resp = await axios({
+      const { data } = await axios({
         baseURL: this.baseURl,
       }).get(`name/${name}`);
 
-      if (resp?.data?.length) {
-        const [{ name, cca2, currencies, demonyms, flags }] = resp.data;
+      if (data && Array.isArray(data)) {
+        const [{ name, cca2, currencies, demonyms, flags }] = data;
 
         const [currInfo]: any = Object.values(currencies);
         const [currCode]: any = Object.keys(currencies);
@@ -54,6 +54,17 @@ export class RestcountriesService implements SetRegionService {
       return response;
     } catch (error) {
       this.logger.error(`Restcountries Error: ${JSON.stringify(error)}`);
+      if (
+        error?.response?.status &&
+        error?.response?.status === HttpStatus.NOT_FOUND
+      ) {
+        throw new Error(error?.response?.statusText);
+      }
+      throw new Error(
+        `Restcountries Error: Something went wrong ====> ${JSON.stringify(
+          error,
+        )}`,
+      );
     }
   }
 }

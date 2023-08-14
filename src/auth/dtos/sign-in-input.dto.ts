@@ -1,18 +1,26 @@
 import {
   IsAscii,
   IsEmail,
+  IsEnum,
   IsNumber,
   IsOptional,
+  IsPhoneNumber,
   IsString,
   MinLength,
 } from 'class-validator';
+import { ProfileType } from 'src/user/profile-information/enums/profile-information.enum';
 import { User } from 'src/user/user.entity';
 
 export class SignInInput implements Partial<User> {
-  @IsEmail()
+  @IsString()
   @MinLength(1)
   @IsOptional()
-  readonly email?: string;
+  readonly identifier?: string;
+
+  @IsPhoneNumber()
+  @MinLength(1)
+  @IsOptional()
+  readonly phone?: string;
 
   @IsAscii()
   @IsOptional()
@@ -26,6 +34,9 @@ export class SignInInput implements Partial<User> {
   @IsString()
   @IsOptional()
   readonly signature?: string;
+
+  @IsEnum(ProfileType)
+  readonly profileType: ProfileType;
 }
 
 export class SignInAsUserInput implements Partial<User> {

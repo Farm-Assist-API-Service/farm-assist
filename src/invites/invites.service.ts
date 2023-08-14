@@ -78,21 +78,21 @@ export class InvitesService {
     }
   }
 
-  async findAllUserInvites(user: User): Promise<Invite[]> {
-    try {
-      return await this.inviteRepo.find({
-        where: { createdBy: user },
-        relations: ['createdBy', 'usedBy'],
-      });
-    } catch (error) {
-      new HandleHttpExceptions({
-        error,
-        source: {
-          service: InvitesService.name,
-          operator: this.findAllUserInvites.name,
-        },
-        report: 'Failed to fetch invites',
-      });
-    }
-  }
+  // async findAllUserInvites(user: User): Promise<Invite[]> {
+  //   try {
+  //     return await this.inviteRepo.find({
+  //       // where: { createdBy: user },
+  //       relations: ['createdBy', 'usedBy'],
+  //     });
+  //   } catch (error) {
+  //     new HandleHttpExceptions({
+  //       error,
+  //       source: {
+  //         service: InvitesService.name,
+  //         operator: this.findAllUserInvites.name,
+  //       },
+  //       report: 'Failed to fetch invites',
+  //     });
+  //   }
+  // }
 }

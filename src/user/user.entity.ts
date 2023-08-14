@@ -19,7 +19,7 @@ import {
   UpdateDateColumn,
   VersionColumn,
 } from 'typeorm';
-import { ProfileInformation } from './profile-information/profile-information.entity';
+import { ProfileInformation } from './profile-information/entities/profile-information.entity';
 
 @Entity()
 export class User {
@@ -49,17 +49,20 @@ export class User {
   @Column()
   password: string;
 
-  @OneToOne(() => ProfileInformation, {
+  @OneToMany(() => ProfileInformation, (profile) => profile.user, {
     eager: true,
   })
   @JoinColumn()
-  profileInformation: ProfileInformation;
+  profileInformation: ProfileInformation[];
 
   @Exclude({ toPlainOnly: true })
   @Column({ nullable: true })
   otp: string;
 
-  @Column({ default: true })
+  @Column({ default: false })
+  otpVerified: boolean;
+
+  @Column({ default: false })
   isActive: boolean;
 
   @Column({

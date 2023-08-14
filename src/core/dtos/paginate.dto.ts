@@ -18,6 +18,11 @@ export class PaginateDto {
   @IsOptional()
   @IsNumber()
   @Type(() => Number)
+  regionId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
   limit?: number;
 
   @IsOptional()
@@ -39,6 +44,14 @@ export class PaginateDto {
   @IsOptional()
   @IsString()
   userId?: number;
+
+  @IsOptional()
+  @IsString()
+  field?: string;
+
+  @IsOptional()
+  @IsString()
+  value?: string;
 
   @IsOptional()
   @IsNumber()

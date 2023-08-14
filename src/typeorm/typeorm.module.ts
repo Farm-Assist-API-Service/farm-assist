@@ -1,16 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from 'src/config/config.module';
-import { ConfigService } from 'src/config/config.service';
-import { TypeOrmOptionsService } from './typeorm-options.service';
-
+import { typeOrmAysncConfig } from './typeorm.config';
 @Module({
-  imports: [
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useClass: TypeOrmOptionsService,
-    }),
-    ConfigModule,
-  ],
+  imports: [TypeOrmModule.forRootAsync(typeOrmAysncConfig), ConfigModule],
 })
 export class TypeormModule {}

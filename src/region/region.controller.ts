@@ -10,12 +10,14 @@ import {
 } from '@nestjs/common';
 import { HttpExceptionFilter } from 'src/utils/filters/http-exception.filter';
 import { LoggingInterceptor } from 'src/utils/interceptors/logging.interceptor';
+import { TransformInterceptor } from 'src/utils/interceptors/transform.interceptor';
 import { CreateRegionDto } from './dto/create-region.dto';
 import { QueryRegionDto } from './dto/query-region.dto';
 import { Region } from './entities/region.entity';
 import { RegionService } from './region.service';
 
 @Controller('region')
+@UseInterceptors(TransformInterceptor)
 @UseInterceptors(LoggingInterceptor)
 @UseFilters(HttpExceptionFilter)
 export class RegionController {

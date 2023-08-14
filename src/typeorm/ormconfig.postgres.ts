@@ -1,24 +1,12 @@
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { plainToClass } from 'class-transformer';
-import { validateSync } from 'class-validator';
-
-import { EnvConfig } from '../config/config.env';
-
+import {
+  TypeOrmModuleOptions,
+  TypeOrmModuleAsyncOptions,
+} from '@nestjs/typeorm';
 import { TypeOrmNamingStrategy } from './typeorm-naming-strategy';
+import { DataSource, DataSourceOptions } from 'typeorm';
+import { env } from 'src/config/config.env';
 
-const env = plainToClass(
-  EnvConfig,
-  { ...EnvConfig.getDefaultObject(), ...process.env },
-  { enableImplicitConversion: true },
-);
-const errors = validateSync(env, { whitelist: true });
-if (errors.length > 0) {
-  // eslint-disable-next-line no-console
-  console.error(JSON.stringify(errors, undefined, '  '));
-  throw new Error('Invalid env.');
-}
-
-const options: TypeOrmModuleOptions = {
+export const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',
   host: env.TYPEORM_HOST,
   port: env.TYPEORM_PORT,
@@ -28,11 +16,12 @@ const options: TypeOrmModuleOptions = {
   entities: [`${__dirname}/../**/*.entity.{ts,js}`],
   migrations: [`${__dirname}/../migrations/*.{ts,js}`],
   namingStrategy: new TypeOrmNamingStrategy(),
-  autoLoadEntities: true,
+  // autoLoadEntities: true,
   // synchronize: true,
   logging: env.TYPEORM_LOGGING,
   ssl: env.NODE_ENV === 'test',
   migrationsTableName: 'migrations',
 };
 
-export = options;
+const dataSource = new DataSource(dataSourceOptions);
+export default dataSource;

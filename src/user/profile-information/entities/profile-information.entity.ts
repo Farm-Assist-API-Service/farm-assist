@@ -1,13 +1,21 @@
 import { Exclude } from 'class-transformer';
+import { Appointment } from 'src/appointment/entities/appointment.entity';
+import { User } from 'src/user/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   Index,
+  JoinTable,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   VersionColumn,
 } from 'typeorm';
+import { ProfileType } from '../enums/profile-information.enum';
+import { EProfileStatus } from '../enums/profile-status.enum';
+import { ProfileReview } from './profile-review.entity';
 
 @Entity()
 export class ProfileInformation {
@@ -19,6 +27,9 @@ export class ProfileInformation {
     nullable: true,
   })
   phone: string;
+
+  @Column({ default: ProfileType.REGULAR, enum: ProfileType })
+  profileType: ProfileType;
 
   @Column({ nullable: true })
   fcmToken: string;
@@ -37,10 +48,34 @@ export class ProfileInformation {
   state: string;
 
   @Column({ nullable: true })
-  workAddress: string;
+  regionId: number;
 
   @Column({ nullable: true })
-  bvn: string;
+  workAddress: string;
+
+  @ManyToOne(() => User, (user) => user.profileInformation)
+  user: User;
+
+  @Column({ nullable: true })
+  userId: number;
+
+  @OneToMany(() => ProfileReview, (review) => review.profile, {
+    onDelete: 'CASCADE',
+  })
+  reviews!: ProfileReview[];
+
+  @Column({
+    type: 'enum',
+    enum: EProfileStatus,
+    default: EProfileStatus.ACTIVE,
+  })
+  status: EProfileStatus;
+
+  @OneToMany(() => Appointment, (appointment) => appointment.host, {
+    onDelete: 'CASCADE',
+    // eager: true,
+  })
+  appointments!: Appointment[];
 
   @Column({
     default: false,

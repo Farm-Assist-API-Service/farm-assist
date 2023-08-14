@@ -11,9 +11,13 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './utils/interceptors/logging.interceptor';
 import { GeneratorModule } from './generator/generator.module';
 import { InvitesModule } from './invites/invites.module';
+import { AppointmentModule } from './appointment/appointment.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     TypeormModule,
     ConfigModule,
     UserModule,
@@ -22,6 +26,8 @@ import { InvitesModule } from './invites/invites.module';
     AuthModule,
     GeneratorModule,
     InvitesModule,
+    AppointmentModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [

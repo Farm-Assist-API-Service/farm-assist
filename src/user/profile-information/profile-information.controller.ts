@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Query,
   UseFilters,
   UseGuards,
@@ -95,5 +96,19 @@ export class ProfileInformationController {
     @Query('reviewId', ParseIntPipe) reviewId: number,
   ): Promise<ProfileReview> {
     return this.profileReviewService.findOne({ where: { id: reviewId } });
+  }
+
+  @Put()
+  updateProfile(
+    @LoggedInUser() user: User,
+    @Query('profileType') profileType: string,
+    @Body()
+    createProfileInformationInput: CreateProfileInformationInput,
+  ): Promise<ProfileInformation> {
+    Object.assign(createProfileInformationInput, { profileType });
+    return this.profileInformationService.updateProfile(
+      user,
+      createProfileInformationInput,
+    );
   }
 }

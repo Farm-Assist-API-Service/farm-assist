@@ -32,4 +32,8 @@ export class CreateProfileInformationInput
   @IsString()
   @IsOptional()
   workAddress?: string;
+
+  @IsString()
+  @IsOptional()
+  fcmToken?: string;
 }

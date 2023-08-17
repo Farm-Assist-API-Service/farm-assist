@@ -188,14 +188,26 @@ export class AuthService {
         );
       }
 
-      // const refreshToken = this.issueRefreshToken(payload);
-
-      // Get Auth token
-      const token = await this.generateToken({
+      const tokenPayload: any = {
         ...ContactID,
         id: user.id,
         role: user.role,
-      });
+      };
+      // const refreshToken = this.issueRefreshToken(payload);
+      if (signInInput.profileType) {
+        const profile = user.profileInformation.find(
+          (each) =>
+            each.profileType ===
+            ProfileType[signInInput.profileType.toUpperCase()],
+        );
+        tokenPayload['profile'] = {
+          id: profile.id,
+          profileType: profile.profileType,
+        };
+      }
+
+      // Get Auth token
+      const token = await this.generateToken(tokenPayload);
 
       const output: any = {
         user: this.filter(user, ['password']),

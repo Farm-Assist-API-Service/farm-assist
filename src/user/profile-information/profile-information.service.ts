@@ -249,4 +249,38 @@ export class ProfileInformationService {
       });
     }
   }
+
+  async updateProfile(
+    user: User,
+    inputs: CreateProfileInformationInput,
+  ): Promise<ProfileInformation> {
+    try {
+      const profile = await this.profileRepo.findOne({
+        where: { profileType: inputs.profileType },
+      });
+      //  const _user = await this.userRepo
+      //    .createQueryBuilder('user')
+      //    .leftJoinAndSelect('user.profileInformation', 'profile')
+      //    .leftJoinAndSelect('user.invite', 'invite')
+      //    .where(ContactID)
+      //    .andWhere(`profile.profileType = '${signInInput.profileType}'`)
+      //    .getOne();
+
+      if (!profile) {
+        throw new HttpException('Invalid profile', HttpStatus.BAD_REQUEST);
+      }
+      const svaed = await this.profileRepo.save(inputs);
+      console.log({ svaed });
+      return svaed;
+    } catch (error) {
+      new HandleHttpExceptions({
+        error,
+        source: {
+          service: ProfileInformationService.name,
+          operator: this.updateProfile.name,
+        },
+        report: 'Error deleting profile',
+      });
+    }
+  }
 }

@@ -200,10 +200,7 @@ export class AuthService {
             each.profileType ===
             ProfileType[signInInput.profileType.toUpperCase()],
         );
-        tokenPayload['profile'] = {
-          id: profile.id,
-          profileType: profile.profileType,
-        };
+        tokenPayload['profile'] = profile;
       }
 
       // Get Auth token

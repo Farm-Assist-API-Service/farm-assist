@@ -6,6 +6,7 @@ import { FindManyOptions, getRepository, Repository } from 'typeorm';
 import { User } from '../user.entity';
 import { UserService } from '../user.service';
 import { CreateProfileInformationInput } from './dtos/create-profile-information.input';
+import { UpdateProfileInformationInput } from './dtos/update-profile-information.input';
 import { ProfileInformation } from './entities/profile-information.entity';
 import { ProfileType } from './enums/profile-information.enum';
 
@@ -251,27 +252,19 @@ export class ProfileInformationService {
   }
 
   async updateProfile(
-    user: User,
-    inputs: CreateProfileInformationInput,
+    profileId: number,
+    { profileType, ...inputs }: UpdateProfileInformationInput,
   ): Promise<ProfileInformation> {
     try {
       const profile = await this.profileRepo.findOne({
-        where: { profileType: inputs.profileType },
+        where: { id: profileId },
       });
-      //  const _user = await this.userRepo
-      //    .createQueryBuilder('user')
-      //    .leftJoinAndSelect('user.profileInformation', 'profile')
-      //    .leftJoinAndSelect('user.invite', 'invite')
-      //    .where(ContactID)
-      //    .andWhere(`profile.profileType = '${signInInput.profileType}'`)
-      //    .getOne();
-
+      Object.assign(profile, { ...inputs });
       if (!profile) {
         throw new HttpException('Invalid profile', HttpStatus.BAD_REQUEST);
       }
-      const svaed = await this.profileRepo.save(inputs);
-      console.log({ svaed });
-      return svaed;
+      const udpate = await this.profileRepo.save(profile);
+      return udpate;
     } catch (error) {
       new HandleHttpExceptions({
         error,
@@ -279,7 +272,7 @@ export class ProfileInformationService {
           service: ProfileInformationService.name,
           operator: this.updateProfile.name,
         },
-        report: 'Error deleting profile',
+        report: 'Error updating profile',
       });
     }
   }

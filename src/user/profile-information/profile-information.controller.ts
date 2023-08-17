@@ -11,9 +11,11 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { OmitType, PartialType } from '@nestjs/mapped-types';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { PaginateDto } from 'src/core/dtos/paginate.dto';
+import { LoggedInProfile } from 'src/utils/decorators/logged-in-profile.decorator';
 import { LoggedInUser } from 'src/utils/decorators/logged-in-user.decorator';
 import { HttpExceptionFilter } from 'src/utils/filters/http-exception.filter';
 import { LoggingInterceptor } from 'src/utils/interceptors/logging.interceptor';
@@ -21,6 +23,7 @@ import { TransformInterceptor } from 'src/utils/interceptors/transform.intercept
 import { User } from '../user.entity';
 import { CreateProfileInformationInput } from './dtos/create-profile-information.input';
 import { CreateProfileReviewDto } from './dtos/create-profile-review';
+import { UpdateProfileInformationInput } from './dtos/update-profile-information.input';
 import { ProfileInformation } from './entities/profile-information.entity';
 import { ProfileReview } from './entities/profile-review.entity';
 import { ProfileType } from './enums/profile-information.enum';
@@ -100,15 +103,13 @@ export class ProfileInformationController {
 
   @Put()
   updateProfile(
-    @LoggedInUser() user: User,
-    @Query('profileType') profileType: string,
+    @LoggedInProfile() profile: ProfileInformation,
     @Body()
-    createProfileInformationInput: CreateProfileInformationInput,
-  ): Promise<ProfileInformation> {
-    Object.assign(createProfileInformationInput, { profileType });
+    updateProfileInformationInput: UpdateProfileInformationInput,
+  ) {
     return this.profileInformationService.updateProfile(
-      user,
-      createProfileInformationInput,
+      profile.id,
+      updateProfileInformationInput,
     );
   }
 }

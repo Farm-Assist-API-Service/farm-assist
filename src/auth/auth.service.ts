@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 
 import { ConfigService } from 'src/config/config.service';
-import { GeneratorService } from 'src/generator/generator.service';
+import { GeneratorService } from 'src/file/services/generator.service';
 import { Region } from 'src/region/entities/region.entity';
 import { RegionService } from 'src/region/region.service';
 import { User } from 'src/user/user.entity';
@@ -30,6 +30,10 @@ import { JwtPayload } from './interfaces/jwt-payload';
 import { UserRoles } from 'src/core/enums/roles.enum';
 import { ProfileInformation } from 'src/user/profile-information/entities/profile-information.entity';
 import { ProfileType } from 'src/user/profile-information/enums/profile-information.enum';
+import { EmailEngineFactory } from 'src/notification/email/factory';
+import { EmailEngines } from 'src/notification/enums/email-engines.enum';
+import { EmailSource } from 'src/notification/enums/email-source.enum';
+import { otpTemplate } from 'src/view/emails/otp';
 
 export type Login = { email: string; phone?: string; password: string };
 
@@ -46,6 +50,7 @@ export class AuthService {
     private readonly regionService: RegionService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly emailService: EmailEngineFactory,
   ) {}
 
   private getContactID(identifier: string): GetContactID {
@@ -107,7 +112,9 @@ export class AuthService {
       });
 
       await this.profileRepo.save(defaultProfile);
-      //TODO: Send Onboarding Email
+      await this.emailService
+        .findOne(EmailEngines.NODE_MAILER)
+        .sendOTPMail(newUser);
       return newUser;
     } catch (error) {
       new HandleHttpExceptions({

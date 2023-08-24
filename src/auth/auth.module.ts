@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/user.entity';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { GeneratorModule } from 'src/generator/generator.module';
+import { FileModule } from 'src/file/file.module';
 import { ConfigModule } from 'src/config/config.module';
 import { Region } from 'src/region/entities/region.entity';
 import { RegionService } from 'src/region/region.service';
@@ -15,9 +15,12 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthOptionsService } from './auth-options.service';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { ProfileInformation } from 'src/user/profile-information/entities/profile-information.entity';
+import { EmailModule } from 'src/notification/email/email.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     TypeOrmModule.forFeature([User, Region, ProfileInformation]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -34,10 +37,11 @@ import { ProfileInformation } from 'src/user/profile-information/entities/profil
       imports: [ConfigModule],
       useClass: AuthOptionsService,
     }),
-    GeneratorModule,
+    FileModule,
     ConfigModule,
     RegionModule,
     JwtModule,
+    EmailModule,
   ],
   providers: [AuthService, RegionService, UserService, JwtStrategy],
   controllers: [AuthController],

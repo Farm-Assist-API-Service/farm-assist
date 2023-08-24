@@ -9,6 +9,7 @@ import { config } from 'dotenv';
 import { plainToClass } from 'class-transformer';
 
 type NODE_ENV = 'development' | 'production' | 'test';
+type MAIL_PROVIDERS = 'gmail';
 type TYPEORM_TYPE = 'auto' | 'sqlite' | 'postgres';
 
 class EnvConfig {
@@ -88,11 +89,25 @@ class EnvConfig {
   @IsBoolean()
   SKIP_AUTH: boolean;
 
+  @IsString()
+  NODE_MAILER_AUTH_USER: string;
+
+  @IsString()
+  NODE_MAILER_AUTH_PASS: string;
+
+  @IsString()
+  APP_BASEL_URL: string;
+
+  @IsIn(['gmail'])
+  NODE_MAILER_SERVICE_PROVIDER: MAIL_PROVIDERS;
+
   static getDefaultObject(): EnvConfig {
     const obj = new EnvConfig();
     obj.NODE_ENV = 'development';
     obj.APP_EMAIL = 'admin@farmassist.com';
     obj.APP_NAME = 'Farm Assist serivce';
+    obj.APP_BASEL_URL =
+      process.env.APP_BASEL_URL || 'https://farm-assist-staging.up.railway.app';
     obj.PORT = 3000;
     obj.TYPEORM_TYPE = (process.env.TYPEORM_TYPE as TYPEORM_TYPE) || 'auto';
     obj.TYPEORM_HOST = process.env.TYPEORM_HOST || 'localhost';
@@ -115,6 +130,10 @@ class EnvConfig {
     obj.FIREBASE_STORAGE_BUCKET = '';
     obj.USE_OTP_VERIFICATION = !!process.env.USE_OTP_VERIFICATION || true;
     obj.SKIP_AUTH = !!process.env.SKIP_AUTH || false;
+    obj.NODE_MAILER_AUTH_USER = process.env.NODE_MAILER_AUTH_USER;
+    obj.NODE_MAILER_AUTH_PASS = process.env.NODE_MAILER_AUTH_PASS;
+    obj.NODE_MAILER_SERVICE_PROVIDER =
+      (process.env.NODE_MAILER_SERVICE_PROVIDER as MAIL_PROVIDERS) || 'gmail';
     return obj;
   }
 }

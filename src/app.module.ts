@@ -9,7 +9,7 @@ import { PaymentModule } from './payment/payment.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './utils/interceptors/logging.interceptor';
-import { GeneratorModule } from './generator/generator.module';
+import { FileModule } from './file/file.module';
 import { InvitesModule } from './invites/invites.module';
 import { AppointmentModule } from './appointment/appointment.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -24,7 +24,7 @@ import { NotificationModule } from './notification/notification.module';
     RegionModule,
     PaymentModule,
     AuthModule,
-    GeneratorModule,
+    FileModule,
     InvitesModule,
     AppointmentModule,
     NotificationModule,

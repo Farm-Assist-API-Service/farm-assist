@@ -1,4 +1,5 @@
 import { PartialType } from '@nestjs/mapped-types';
+import { Exclude } from 'class-transformer';
 import {
   IsAscii,
   IsBoolean,
@@ -23,4 +24,7 @@ export class UpdateProfileInformationInput extends PartialType(
   @IsString()
   @IsOptional()
   fcmToken?: string;
+
+  @Exclude()
+  profileType?: ProfileType;
 }

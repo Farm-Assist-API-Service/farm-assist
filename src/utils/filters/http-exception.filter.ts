@@ -17,6 +17,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const exceptionStatus = exception.getStatus();
     const exceptionResponse: any = exception.getResponse();
+    const request = ctx.getRequest<Request>();
     console.log(`exceptionResponse`, exceptionResponse);
     const isString = typeof exceptionResponse === 'string';
 
@@ -28,8 +29,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
 
     const resPayload: any = {
+      timestamp: new Date().toISOString(),
+      path: request.url,
       status: exceptionStatus <= 500 ? 'fail' : 'error',
-      message,
+      message: exception?.message || message,
       data,
     };
 

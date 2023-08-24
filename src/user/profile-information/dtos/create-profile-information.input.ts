@@ -23,6 +23,9 @@ export class CreateProfileInformationInput
   readonly profileType?: ProfileType = ProfileType.REGULAR;
 
   @IsString()
+  name: string;
+
+  @IsString()
   phone: string;
 
   @IsString()

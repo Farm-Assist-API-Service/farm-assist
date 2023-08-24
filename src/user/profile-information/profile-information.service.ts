@@ -99,8 +99,6 @@ export class ProfileInformationService {
 
       const profiles = _user.profileInformation;
 
-      console.log({ type });
-
       if (!profiles.length) {
         throw new HttpException(
           'Sorry, you have no profile',
@@ -140,17 +138,14 @@ export class ProfileInformationService {
     value,
     groupByDate,
     regionId,
+    profileType,
     ...paginateDto
   }: PaginateDto): Promise<any> {
     try {
       const skippedItems = (page - 1) * limit;
-      const order = {};
-      if (sortBy) {
-        order[sortBy] = orderBy || 'DESC';
-      } else {
-        // eslint-disable-next-line dot-notation
-        order['id'] = 'DESC';
-      }
+      const order = {
+        createdAt: orderBy || 'DESC',
+      };
       let profiles = [];
       let totalCount = 0;
 
@@ -167,8 +162,10 @@ export class ProfileInformationService {
       if (status) {
         whereOptions['status'] = status;
       }
-      if (query) {
-        whereOptions['profileType'] = query;
+      if (profileType && !ProfileType[profileType.toUpperCase()]) {
+        throw new HttpException('Invalid profileType', HttpStatus.BAD_REQUEST);
+      } else {
+        whereOptions['profileType'] = profileType;
       }
       if (field && value) {
         whereOptions[field] = value;
@@ -254,15 +251,22 @@ export class ProfileInformationService {
   async updateProfile(
     profileId: number,
     { profileType, ...inputs }: UpdateProfileInformationInput,
-  ): Promise<ProfileInformation> {
+  ) {
     try {
-      const profile = await this.profileRepo.findOne({
-        where: { id: profileId },
-      });
-      Object.assign(profile, { ...inputs });
+      const profiles = await this.profileRepo.find({});
+      if (inputs.phone && profiles.find((p) => p.phone === inputs.phone)) {
+        throw new HttpException(
+          'Phone not available',
+          HttpStatus.NOT_ACCEPTABLE,
+        );
+      }
+
+      const profile = profiles.find((p) => p.id === profileId);
+
       if (!profile) {
         throw new HttpException('Invalid profile', HttpStatus.BAD_REQUEST);
       }
+      Object.assign(profile, { ...inputs });
       const udpate = await this.profileRepo.save(profile);
       return udpate;
     } catch (error) {

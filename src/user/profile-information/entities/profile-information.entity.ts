@@ -22,6 +22,9 @@ export class ProfileInformation {
   @PrimaryGeneratedColumn()
   readonly id: number;
 
+  @Column({ nullable: true })
+  name: string;
+
   @Column({
     type: 'varchar',
     nullable: true,
@@ -53,7 +56,9 @@ export class ProfileInformation {
   @Column({ nullable: true })
   workAddress: string;
 
-  @ManyToOne(() => User, (user) => user.profileInformation)
+  @ManyToOne(() => User, (user) => user.profileInformation, {
+    eager: true,
+  })
   user: User;
 
   @Column({ nullable: true })

@@ -50,7 +50,7 @@ export class User {
   password: string;
 
   @OneToMany(() => ProfileInformation, (profile) => profile.user, {
-    eager: true,
+    // eager: true,
   })
   @JoinColumn()
   profileInformation: ProfileInformation[];

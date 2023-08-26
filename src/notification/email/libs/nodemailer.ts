@@ -77,8 +77,8 @@ export class Nodemailer implements IEmailService {
         console.log(error);
       } else {
         console.log(
-          `✨ Email sent successfully =====> ${inputs.to}`,
-          info.response,
+          `🚚✨ Email sent successfully =====> ${inputs.to}`,
+          // info.response,
         );
       }
     });
@@ -108,8 +108,14 @@ export class Nodemailer implements IEmailService {
         appointment.description
       }; Guests: [${guestEmails.join(',')}]; Location: ${
         appointment.location
-      }; Duration: ${appointment.duration}${appointment.unitOfTime}`,
+      }; Duration: ${appointment.duration}${
+        appointment.unitOfTime
+      }; Meeting link: ${appointment.locationLink}`,
     });
+
+    this.logger.debug(
+      `Appointmet Host ===========> ${appointment.host.user.email}`,
+    );
 
     const acceptLink = `${env.APP_BASEL_URL}/accept/${appointment.id}`;
     const rejectLink = `${env.APP_BASEL_URL}/reject/${appointment.id}`;
@@ -131,6 +137,7 @@ export class Nodemailer implements IEmailService {
           appointment.unitOfTime
         }; ###[Accept Appointment: ${acceptLink}; Reject Appointment: ${rejectLink}]`,
       });
+      this.logger.debug(`Appointmet Guest ===========> ${profile.user.email}`);
     }
   }
 
@@ -144,14 +151,35 @@ export class Nodemailer implements IEmailService {
       text: `You cancelled "${appointment.title}" Appointment`,
     });
 
+    let text = `"${appointment.title}" has been cancelled.`;
+
+    if (appointment.cancellation) {
+      text += `Reason: ${appointment.cancellation.reason}`;
+    }
+
     for (const profile of appointment.guests) {
       this.sendMail({
         from: env.APP_EMAIL,
         to: profile.user.email,
-        subject: `You have been invited for a ${appointment.duration}${appointment.unitOfTime} appointment by ${appointment.host.user.firstName}`,
-        text: `Hi ${profile.user.firstName}, The appointment "${appointment.title}" was cancelled by${appointment.host.user.firstName}.`,
+        subject: `Appointment cancelled!`,
+        text,
+
         // text: `Hi ${profile.user.firstName}, apologies. The appointment "${appointment.title}" was cancelled by${appointment.host.user.firstName} due to ${appointment.cancellation.reason}.`,
       });
     }
+  }
+
+  async sendAppointmentAcceptanceMail(
+    guest: ProfileInformation,
+    appointment: Appointment,
+  ): Promise<void> {
+    this.sendMail({
+      from: env.APP_EMAIL,
+      to: appointment.host.user.email,
+      subject: `Appointment accepted!`,
+      text: `${guest.user.firstName} accepted your appointment - "${
+        appointment.title
+      }." Date: ${moment(appointment.date).format('LL')}`,
+    });
   }
 }

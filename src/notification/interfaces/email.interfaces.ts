@@ -1,4 +1,5 @@
 import { Appointment } from 'src/appointment/entities/appointment.entity';
+import { ProfileInformation } from 'src/user/profile-information/entities/profile-information.entity';
 import { User } from 'src/user/user.entity';
 
 export type MailOptions = {
@@ -31,4 +32,8 @@ export interface IEmailService {
   sendOTPMail(user: User): Promise<void>;
   sendAppointmentMail(appointment: Appointment): Promise<void>;
   sendAppointmentCancellationMail(appointment: Appointment): Promise<void>;
+  sendAppointmentAcceptanceMail(
+    guest: ProfileInformation,
+    appointment: Appointment,
+  ): Promise<void>;
 }

@@ -7,6 +7,7 @@ import {
   Entity,
   Index,
   JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -76,11 +77,14 @@ export class ProfileInformation {
   })
   status: EProfileStatus;
 
-  @OneToMany(() => Appointment, (appointment) => appointment.host, {
-    onDelete: 'CASCADE',
-    // eager: true,
-  })
-  appointments!: Appointment[];
+  // @OneToMany(() => Appointment, (appointment) => appointment.host, {
+  //   onDelete: 'CASCADE',
+  //   // eager: true,
+  // })
+  // appointments!: Appointment[];
+
+  @ManyToMany(() => Appointment, (appointment) => appointment.guests)
+  appointments: Appointment[];
 
   @Column({
     default: false,

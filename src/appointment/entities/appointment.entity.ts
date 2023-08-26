@@ -9,6 +9,8 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -28,8 +30,12 @@ export class Appointment {
   @Column({ nullable: true })
   description: string;
 
-  @OneToMany(() => ProfileInformation, (profile) => profile)
-  guests!: ProfileInformation[];
+  // @ManyToMany(() => ProfileInformation)
+  // guests!: ProfileInformation[];
+
+  @ManyToMany(() => ProfileInformation, (profile) => profile.appointments)
+  @JoinTable()
+  guests: ProfileInformation[];
 
   @Column({ default: 1 })
   duration!: number;
@@ -47,9 +53,18 @@ export class Appointment {
   @Column({ enum: ELocation, type: 'enum' })
   location: ELocation;
 
-  @ManyToOne(() => ProfileInformation, (profile) => profile.id, { eager: true })
+  @Column({ nullable: true })
+  locationLink: string;
+
+  @ManyToOne(() => ProfileInformation)
   @JoinColumn()
   host: ProfileInformation; // This could be a consultee(s) (Farmer(s)) - Consultant
+
+  @Column('simple-json', { nullable: true, default: null })
+  cancellation: {
+    reason: string;
+    cancelledAt: Date;
+  };
 
   @Column()
   readonly date: Date;

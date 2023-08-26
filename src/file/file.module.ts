@@ -5,6 +5,6 @@ import { GeneratorService } from './services/generator.service';
 
 @Module({
   providers: [GeneratorService, ConfigService, FsService],
-  exports: [GeneratorService],
+  exports: [GeneratorService, FsService],
 })
 export class FileModule {}

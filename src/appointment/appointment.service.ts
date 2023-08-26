@@ -9,11 +9,14 @@ import { ProfileInformation } from 'src/user/profile-information/entities/profil
 import { ProfileReview } from 'src/user/profile-information/entities/profile-review.entity';
 import { EProfileStatus } from 'src/user/profile-information/enums/profile-status.enum';
 import { User } from 'src/user/user.entity';
+import { DateHelpers } from 'src/utils/helpers/date.helpers';
 import { HandleHttpExceptions } from 'src/utils/helpers/handle-http-exceptions';
 import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import { CancelAppointmentDto } from './dtos/cancel-appointment.dto';
 import { CreateAppointmentDto } from './dtos/create-appointment.dto';
 import { Appointment } from './entities/appointment.entity';
+import { EAppointmentStatus } from './enums/appointment-status.enum';
+import { GoogleService } from './providers/google.service';
 
 @Injectable()
 export class AppointmentService implements Services {
@@ -25,6 +28,7 @@ export class AppointmentService implements Services {
     @InjectRepository(ProfileInformation)
     private readonly profileRepo: Repository<ProfileInformation>,
     private readonly emailService: EmailEngineFactory,
+    private readonly googleService: GoogleService,
   ) {
     this.logger = new Logger(AppointmentService.name);
   }
@@ -67,14 +71,22 @@ export class AppointmentService implements Services {
           this.logger.error(error);
           throw new HttpException(error, HttpStatus.BAD_REQUEST);
         }
-        guests.push(profiles.find((each) => each.id === id));
+        // Exclude host
+        if (id !== host.id) {
+          guests.push(profiles.find((each) => each.id === id));
+        }
       });
+
+      // TODO: Change to Appointment Provider. Use this one as default
+      const locationLink = await this.googleService.meet.createMeet();
 
       const newAppointment = this.appointmentRepo.create({
         ...inputs,
         host,
         guests,
+        locationLink,
       });
+
       this.logger.log('Before appointment creation');
       const appointment = await this.appointmentRepo.save(newAppointment);
       this.logger.log('After appointment creation');
@@ -140,13 +152,20 @@ export class AppointmentService implements Services {
         relations: ['guests', 'host'],
       });
 
-      // if (!appointment) {
-      //   throw new HttpException('Invalid appointment ', HttpStatus.BAD_REQUEST);
-      // }
+      if (appointment.status === EAppointmentStatus.CANCELLED) {
+        throw new HttpException(
+          'Invalid appointment ',
+          HttpStatus.NOT_ACCEPTABLE,
+        );
+      }
+
+      if (!appointment) {
+        throw new HttpException('Invalid appointment ', HttpStatus.BAD_REQUEST);
+      }
+
       if (appointment) {
-        const isHost = appointment.host.user.id === profile.userId;
+        const isHost = appointment.host.id === profile.id;
         this.logger.log(`Cancel appointment ====> ${appointment.title}`);
-        console.log({ cancelAppointmentDto });
 
         if (!isHost) {
           throw new HttpException(
@@ -154,12 +173,23 @@ export class AppointmentService implements Services {
             HttpStatus.BAD_REQUEST,
           );
         }
+
+        Object.assign(appointment, {
+          status: EAppointmentStatus.CANCELLED,
+          cancellation: {
+            reason: cancelAppointmentDto.reason,
+            cancelledAt: DateHelpers.now(),
+          },
+        });
+
+        const updatedAppointment = await this.appointmentRepo.save(appointment);
         // Notify Guests of cancellation
         await this.emailService
           .findOne(EmailEngines.NODE_MAILER)
-          .sendAppointmentCancellationMail(appointment);
+          .sendAppointmentCancellationMail(updatedAppointment);
       }
     } catch (error) {
+      this.logger.error(error);
       new HandleHttpExceptions({
         error,
         source: {
@@ -167,6 +197,49 @@ export class AppointmentService implements Services {
           operator: this.cancelAppointment.name,
         },
         report: 'Error cancelling appointment',
+      });
+    }
+  }
+
+  async acceptAppointment(
+    appointmentId: number,
+    guestId: number,
+  ): Promise<void> {
+    try {
+      const appointment = await this.appointmentRepo.findOne({
+        where: { id: appointmentId },
+        relations: ['host'],
+      });
+
+      if (appointment.status === EAppointmentStatus.CANCELLED) {
+        throw new HttpException(
+          'Invalid appointment ',
+          HttpStatus.NOT_ACCEPTABLE,
+        );
+      }
+
+      if (appointment) {
+        this.logger.log(`Accepted appointment ====> ${appointment.title}`);
+
+        const guest = await this.profileRepo.findOne({
+          where: { id: guestId },
+          relations: ['user'],
+        });
+
+        // Notify Guests of acceptance
+        await this.emailService
+          .findOne(EmailEngines.NODE_MAILER)
+          .sendAppointmentAcceptanceMail(guest, appointment);
+      }
+    } catch (error) {
+      this.logger.error(error);
+      new HandleHttpExceptions({
+        error,
+        source: {
+          service: AppointmentService.name,
+          operator: this.cancelAppointment.name,
+        },
+        report: 'Error accept appointment',
       });
     }
   }

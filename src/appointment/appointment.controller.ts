@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Post,
@@ -45,19 +47,37 @@ export class AppointmentController {
   }
 
   @Get()
-  getUserAppointments(
+  async getUserAppointments(
     @LoggedInUser() user: User,
     @Body() inputs: CreateAppointmentDto,
   ): Promise<Appointment[]> {
-    return this.appointmentService.getUserAppointments(user);
+    return await this.appointmentService.getUserAppointments(user);
   }
 
   @Put('cancel/:appointmentId')
-  cancelAppointment(
+  async cancelAppointment(
     @LoggedInProfile() profile: ProfileInformation,
     @Body() inputs: CancelAppointmentDto,
     @Param('appointmentId', ParseIntPipe) appointmentId: number,
   ) {
-    this.appointmentService.cancelAppointment(appointmentId, profile, inputs);
+    if (!appointmentId) {
+      throw new HttpException('appointmentId required', HttpStatus.BAD_REQUEST);
+    }
+    await this.appointmentService.cancelAppointment(
+      appointmentId,
+      profile,
+      inputs,
+    );
+  }
+
+  @Put('accept/:appointmentId')
+  async acceptAppointment(
+    @LoggedInProfile() profile: ProfileInformation,
+    @Param('appointmentId', ParseIntPipe) appointmentId: number,
+  ) {
+    if (!appointmentId) {
+      throw new HttpException('appointmentId required', HttpStatus.BAD_REQUEST);
+    }
+    await this.appointmentService.acceptAppointment(appointmentId, profile.id);
   }
 }

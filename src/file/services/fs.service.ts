@@ -32,6 +32,23 @@ export class FsService {
     });
   }
 
+  saveJSON(json: object): Promise<string> {
+    const resolvedPath = resolve('/');
+    // return Promise.resolve(resolvedPath);
+    return new Promise((resolve, reject) => {
+      fs.writeFile(
+        resolvedPath,
+        JSON.stringify(json, null, 2),
+        'utf-8',
+        function (err) {
+          if (err) throw err;
+          console.log('Done!');
+          resolve('done');
+        },
+      );
+    });
+  }
+
   readFile(filePath: string): Promise<string> {
     const resolvedPath = resolve(filePath);
     console.log({ resolvedPath });

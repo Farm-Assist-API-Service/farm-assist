@@ -5,6 +5,7 @@ type U = 'days' | 'weeks' | 'years';
 export const DEFAULT_DATE_FORMAT = 'DD/MM/YYYY';
 export const YEAR_MONTH_DAY_DATE_FORMAT = 'YYYY-MM-DD';
 export const HOUR_MIN_SEC_TIME_FORMAT = 'HH:mm:ss';
+export const DAY_MONTH_DATE_YEAR_TIME_FORMAT = 'LLLL';
 
 export type Format =
   | typeof DEFAULT_DATE_FORMAT
@@ -23,6 +24,15 @@ export class DateHelpers {
   ): number {
     const secDate: any = (date2 && moment(date2 as Date)) || moment();
     return secDate.diff(moment(date1 as Date), unit);
+  }
+
+  static readableDate(date: Date): string {
+    const now = moment();
+    const unknownDate = moment(new Date(date));
+    const isToday = now.diff(unknownDate, 'days');
+    return isToday === 0
+      ? moment(date).calendar()
+      : moment(date).format(DAY_MONTH_DATE_YEAR_TIME_FORMAT);
   }
 
   // eslint-disable-next-line class-methods-use-this

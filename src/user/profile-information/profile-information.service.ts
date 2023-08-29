@@ -42,10 +42,10 @@ export class ProfileInformationService {
 
       if (defaultProfile) {
         this.logger.log(`Deleting regular profile for ${user.email}!!`);
-        await this.deleteProfile(defaultProfile.id);
+        await this.deleteProfile(defaultProfile);
       }
 
-      const exist = user.profileInformation.find(
+      const exist = _user.profileInformation.find(
         (profile) =>
           profile.profileType ===
           ProfileType[createProfileInformationInput.profileType.toUpperCase()],
@@ -233,9 +233,9 @@ export class ProfileInformationService {
     }
   }
 
-  async deleteProfile(profileId: number): Promise<void> {
+  async deleteProfile(profile: ProfileInformation): Promise<void> {
     try {
-      this.profileRepo.delete(profileId);
+      this.profileRepo.remove(profile);
     } catch (error) {
       new HandleHttpExceptions({
         error,

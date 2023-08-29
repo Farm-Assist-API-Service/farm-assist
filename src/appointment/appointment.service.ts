@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ConfigService } from 'src/config/config.service';
 import { AppointmentEvents } from 'src/core/enums/events/appointment.events';
 import { Services } from 'src/core/interfaces/services';
 import { EmailEngineFactory } from 'src/notification/email/factory';
@@ -9,6 +10,7 @@ import { ProfileInformation } from 'src/user/profile-information/entities/profil
 import { ProfileReview } from 'src/user/profile-information/entities/profile-review.entity';
 import { EProfileStatus } from 'src/user/profile-information/enums/profile-status.enum';
 import { User } from 'src/user/user.entity';
+import { AesEncryption } from 'src/utils/helpers/aes-encryption';
 import { DateHelpers } from 'src/utils/helpers/date.helpers';
 import { HandleHttpExceptions } from 'src/utils/helpers/handle-http-exceptions';
 import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
@@ -17,10 +19,15 @@ import { CreateAppointmentDto } from './dtos/create-appointment.dto';
 import { Appointment } from './entities/appointment.entity';
 import { EAppointmentStatus } from './enums/appointment-status.enum';
 import { GoogleService } from './providers/google.service';
+import { env } from 'src/config/config.env';
+import { EAppointmentActions } from './enums/appointment-actions.enum';
 
 @Injectable()
 export class AppointmentService implements Services {
   private logger: Logger;
+
+  protected encryption: AesEncryption;
+
   constructor(
     private readonly eventEmitter: EventEmitter2,
     @InjectRepository(Appointment)
@@ -31,11 +38,13 @@ export class AppointmentService implements Services {
     private readonly googleService: GoogleService,
   ) {
     this.logger = new Logger(AppointmentService.name);
+    this.encryption = new AesEncryption(env.RSA_PRIVATE_KEY);
   }
 
   async create(
     inputs: CreateAppointmentDto,
-    profileId: number,
+    profile: ProfileInformation,
+    user: User,
   ): Promise<Appointment> {
     try {
       const guests: ProfileInformation[] = [];
@@ -47,7 +56,7 @@ export class AppointmentService implements Services {
         .getMany();
 
       const profileIds = new Set(profiles.map((p) => p.id));
-      const host = profiles.find((p) => p.id === profileId);
+      const host = profiles.find((p) => p.id === profile.id);
 
       if (!host) {
         throw new HttpException(
@@ -72,13 +81,14 @@ export class AppointmentService implements Services {
           throw new HttpException(error, HttpStatus.BAD_REQUEST);
         }
         // Exclude host
-        if (id !== host.id) {
+        if (profiles.find((each) => each.id === id).userId !== user.id) {
           guests.push(profiles.find((each) => each.id === id));
         }
       });
 
       // TODO: Change to Appointment Provider. Use this one as default
-      const locationLink = await this.googleService.meet.createMeet();
+      // inputs.location determines what Meeting provider to use
+      const locationLink = await this.googleService.meet.createMeet(); // Default Meeting Provider
 
       const newAppointment = this.appointmentRepo.create({
         ...inputs,
@@ -133,7 +143,7 @@ export class AppointmentService implements Services {
 
   @OnEvent(AppointmentEvents.CREATE)
   async notify(newAppointment: Appointment): Promise<void> {
-    this.logger.log('New apoointed created');
+    this.logger.log('New appointed created');
 
     // Notify Guests of appointments
     await this.emailService
@@ -152,16 +162,16 @@ export class AppointmentService implements Services {
         relations: ['guests', 'host'],
       });
 
-      if (appointment.status === EAppointmentStatus.CANCELLED) {
-        throw new HttpException(
-          'Invalid appointment ',
-          HttpStatus.NOT_ACCEPTABLE,
-        );
+      if (!appointment) {
+        throw new HttpException('Invalid appointment', HttpStatus.BAD_REQUEST);
       }
 
-      if (!appointment) {
-        throw new HttpException('Invalid appointment ', HttpStatus.BAD_REQUEST);
-      }
+      // if (appointment.status === EAppointmentStatus.CANCELLED) {
+      //   throw new HttpException(
+      //     'Appointment was cancelled',
+      //     HttpStatus.NOT_ACCEPTABLE,
+      //   );
+      // }
 
       if (appointment) {
         const isHost = appointment.host.id === profile.id;
@@ -183,7 +193,7 @@ export class AppointmentService implements Services {
         });
 
         const updatedAppointment = await this.appointmentRepo.save(appointment);
-        // Notify Guests of cancellation
+        // Notify Guests & Host of cancellation
         await this.emailService
           .findOne(EmailEngines.NODE_MAILER)
           .sendAppointmentCancellationMail(updatedAppointment);
@@ -201,14 +211,12 @@ export class AppointmentService implements Services {
     }
   }
 
-  async acceptAppointment(
-    appointmentId: number,
-    guestId: number,
-  ): Promise<void> {
+  async actionAppointment(token: string): Promise<EAppointmentActions> {
     try {
+      const decrytedLinks = JSON.parse(this.encryption.decrypt(token));
       const appointment = await this.appointmentRepo.findOne({
-        where: { id: appointmentId },
-        relations: ['host'],
+        where: { id: decrytedLinks.appointmentId },
+        relations: ['host', 'guests'],
       });
 
       if (appointment.status === EAppointmentStatus.CANCELLED) {
@@ -218,19 +226,16 @@ export class AppointmentService implements Services {
         );
       }
 
-      if (appointment) {
-        this.logger.log(`Accepted appointment ====> ${appointment.title}`);
+      const guest = await this.profileRepo.findOne({
+        where: { id: decrytedLinks.guestId },
+        relations: ['user'],
+      });
 
-        const guest = await this.profileRepo.findOne({
-          where: { id: guestId },
-          relations: ['user'],
-        });
+      decrytedLinks.action === EAppointmentActions.ACCEPTED
+        ? this.acceptAppointment(appointment, guest)
+        : this.rejectAppointment(appointment, guest);
 
-        // Notify Guests of acceptance
-        await this.emailService
-          .findOne(EmailEngines.NODE_MAILER)
-          .sendAppointmentAcceptanceMail(guest, appointment);
-      }
+      return EAppointmentActions[decrytedLinks.action.toUpperCase()];
     } catch (error) {
       this.logger.error(error);
       new HandleHttpExceptions({
@@ -243,4 +248,32 @@ export class AppointmentService implements Services {
       });
     }
   }
+
+  async acceptAppointment(
+    appointment: Appointment,
+    guest: ProfileInformation,
+  ): Promise<void> {
+    this.logger.log(`Accepted appointment on ====> ${appointment.title}`);
+    // Notify host & guest of acceptance
+    await this.emailService
+      .findOne(EmailEngines.NODE_MAILER)
+      .sendAppointmentAcceptanceMail(guest, appointment);
+  }
+
+  async rejectAppointment(
+    appointment: Appointment,
+    guest: ProfileInformation,
+  ): Promise<void> {
+    this.logger.log(`Rejected appointment on ====> ${appointment.title}`);
+
+    const guests = appointment.guests.filter((p) => p.id !== guest.id);
+    appointment.guests = guests;
+    await this.appointmentRepo.save(appointment);
+    // Notify Guests of acceptance
+    await this.emailService
+      .findOne(EmailEngines.NODE_MAILER)
+      .sendAppointmentRejectionMail(guest, appointment);
+  }
+
+  async adjustAppointment(appointment: Appointment): Promise<void> {}
 }

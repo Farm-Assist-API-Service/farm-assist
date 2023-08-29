@@ -36,4 +36,8 @@ export interface IEmailService {
     guest: ProfileInformation,
     appointment: Appointment,
   ): Promise<void>;
+  sendAppointmentRejectionMail(
+    guest: ProfileInformation,
+    appointment: Appointment,
+  ): Promise<void>;
 }

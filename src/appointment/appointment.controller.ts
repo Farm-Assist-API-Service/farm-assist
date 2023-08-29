@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseFilters,
   UseGuards,
   UseInterceptors,
@@ -36,9 +37,10 @@ export class AppointmentController {
   @Post()
   create(
     @LoggedInProfile() profile: ProfileInformation,
+    @LoggedInUser() user: User,
     @Body() inputs: CreateAppointmentDto,
   ): Promise<Appointment> {
-    return this.appointmentService.create(inputs, profile.id);
+    return this.appointmentService.create(inputs, profile, user);
   }
 
   @Get()
@@ -68,16 +70,5 @@ export class AppointmentController {
       profile,
       inputs,
     );
-  }
-
-  @Put('accept/:appointmentId')
-  async acceptAppointment(
-    @LoggedInProfile() profile: ProfileInformation,
-    @Param('appointmentId', ParseIntPipe) appointmentId: number,
-  ) {
-    if (!appointmentId) {
-      throw new HttpException('appointmentId required', HttpStatus.BAD_REQUEST);
-    }
-    await this.appointmentService.acceptAppointment(appointmentId, profile.id);
   }
 }

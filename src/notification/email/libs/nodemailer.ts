@@ -13,10 +13,15 @@ import {
 } from 'src/notification/interfaces/email.interfaces';
 import { User } from 'src/user/user.entity';
 import { otpTemplate } from 'src/view/emails/otp';
-import { Logger } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import { Appointment } from 'src/appointment/entities/appointment.entity';
 import * as moment from 'moment';
 import { ProfileInformation } from 'src/user/profile-information/entities/profile-information.entity';
+import { ConfigService } from 'src/config/config.service';
+import { GenAppLinks } from 'src/appointment/interfaces/appointment.service.interfaces';
+import { AesEncryption } from 'src/utils/helpers/aes-encryption';
+import { EAppointmentActions } from 'src/appointment/enums/appointment-actions.enum';
+import { DateHelpers } from 'src/utils/helpers/date.helpers';
 
 const ReadFile = promisify(readFile);
 
@@ -25,7 +30,12 @@ export class Nodemailer implements IEmailService {
 
   private readonly logger: Logger;
 
-  constructor(private readonly gene, private eventEmitter: EventEmitter2) {
+  constructor(
+    private readonly gene,
+    private eventEmitter: EventEmitter2,
+    private readonly configService: ConfigService,
+    private readonly encryption: AesEncryption,
+  ) {
     this.transporter = nodemailer.createTransport({
       service: env.NODE_MAILER_SERVICE_PROVIDER,
       auth: {
@@ -34,6 +44,8 @@ export class Nodemailer implements IEmailService {
       },
     });
     this.logger = new Logger(Nodemailer.name);
+
+    this.encryption = new AesEncryption(env.RSA_PRIVATE_KEY);
   }
 
   private async getEmailTemplate(templateName: string, context?: any) {
@@ -97,16 +109,43 @@ export class Nodemailer implements IEmailService {
     });
   }
 
+  private generateAppointmentLinks(
+    appointment: Appointment,
+    guest: ProfileInformation,
+  ): GenAppLinks {
+    const acceptCode = this.encryption.encrypt(
+      JSON.stringify({
+        guestId: guest.id,
+        appointmentId: appointment.id,
+        action: EAppointmentActions.ACCEPTED,
+      }),
+    );
+
+    const rejectCode = this.encryption.encrypt(
+      JSON.stringify({
+        guestId: guest.id,
+        appointmentId: appointment.id,
+        action: EAppointmentActions.CANCELLED,
+      }),
+    );
+
+    const acceptLink = `${env.APP_BASEL_URL}/appointments?action=${acceptCode}`;
+    const rejectLink = `${env.APP_BASEL_URL}/appointments?action=${rejectCode}`;
+    return { acceptLink, rejectLink };
+  }
+
   async sendAppointmentMail(appointment: Appointment): Promise<void> {
     const guestEmails = appointment.guests.map((g) => g.user.email);
-
+    // Mail host about appoinment
     this.sendMail({
       from: env.APP_EMAIL,
       to: appointment.host.user.email,
       subject: `New Appointment created!`,
-      text: `Title: ${appointment.title}; Description: ${
-        appointment.description
-      }; Guests: [${guestEmails.join(',')}]; Location: ${
+      text: `You just created an appointment on "${appointment.title}" ${
+        appointment.description ? `- ${appointment.description};` : ''
+      } scheduled for ${DateHelpers.readableDate(
+        appointment.date,
+      )}. Guests: [${guestEmails.join(',')}]; Location: ${
         appointment.location
       }; Duration: ${appointment.duration}${
         appointment.unitOfTime
@@ -117,25 +156,31 @@ export class Nodemailer implements IEmailService {
       `Appointmet Host ===========> ${appointment.host.user.email}`,
     );
 
-    const acceptLink = `${env.APP_BASEL_URL}/accept/${appointment.id}`;
-    const rejectLink = `${env.APP_BASEL_URL}/reject/${appointment.id}`;
-
     for (const profile of appointment.guests) {
+      const appointmentLinks = this.generateAppointmentLinks(
+        appointment,
+        profile,
+      );
+
       this.sendMail({
         from: env.APP_EMAIL,
         to: profile.user.email,
         subject: `You have been invited for a ${appointment.duration}${appointment.unitOfTime} appointment by ${appointment.host.user.firstName}`,
         text: `Hi ${
           profile.user.firstName
-        }, I hope this message finds you well. I wanted to extend a formal invitation for "${
-          appointment.title
-        }". Date: ${moment(appointment.date).format('LL')};  Host: ${
+        }, I hope this message finds you well. I am ${
           appointment.host.user.firstName
-        } ${appointment.host.user.lastName}; Location: ${
-          appointment.location
-        }; Duration: ${appointment.duration}${
+        } ${appointment.host.user.lastName}. A ${
+          appointment.host.profileType
+        } at ${env.APP_NAME}. I wanted to extend a formal invitation for "${
+          appointment.title
+        }". Scheduled for ${DateHelpers.readableDate(
+          appointment.date,
+        )}. Appointment will last for ${appointment.duration}${
           appointment.unitOfTime
-        }; ###[Accept Appointment: ${acceptLink}; Reject Appointment: ${rejectLink}]`,
+        }. Would you be available? [Yes: ${appointmentLinks.acceptLink}] [No: ${
+          appointmentLinks.rejectLink
+        }]`,
       });
       this.logger.debug(`Appointmet Guest ===========> ${profile.user.email}`);
     }
@@ -148,13 +193,13 @@ export class Nodemailer implements IEmailService {
       from: env.APP_EMAIL,
       to: appointment.host.user.email,
       subject: `Appointment cancelled!`,
-      text: `You cancelled "${appointment.title}" Appointment`,
+      text: `You cancelled appointment on "${appointment.title}"`,
     });
 
-    let text = `"${appointment.title}" has been cancelled.`;
+    let text = `${appointment.host.user.firstName} cancelled "${appointment.title}" appointment.`;
 
     if (appointment.cancellation) {
-      text += `Reason: ${appointment.cancellation.reason}`;
+      text += ` Reasons: "${appointment.cancellation.reason}"`;
     }
 
     for (const profile of appointment.guests) {
@@ -163,8 +208,6 @@ export class Nodemailer implements IEmailService {
         to: profile.user.email,
         subject: `Appointment cancelled!`,
         text,
-
-        // text: `Hi ${profile.user.firstName}, apologies. The appointment "${appointment.title}" was cancelled by${appointment.host.user.firstName} due to ${appointment.cancellation.reason}.`,
       });
     }
   }
@@ -173,13 +216,47 @@ export class Nodemailer implements IEmailService {
     guest: ProfileInformation,
     appointment: Appointment,
   ): Promise<void> {
+    // Mail host of acceptance
     this.sendMail({
       from: env.APP_EMAIL,
       to: appointment.host.user.email,
       subject: `Appointment accepted!`,
-      text: `${guest.user.firstName} accepted your appointment - "${
+      text: `${guest.user.firstName} accepted your appointment on "${
         appointment.title
-      }." Date: ${moment(appointment.date).format('LL')}`,
+      }." scheduled for ${DateHelpers.readableDate(appointment.date)}`,
+    });
+
+    // Mail guest meeting links
+    this.sendMail({
+      from: env.APP_EMAIL,
+      to: guest.user.email,
+      subject: `You accpeted appointment with ${appointment.host.user.firstName}`,
+      text: `Here is the meeting link for "${appointment.title}" - ${
+        appointment.locationLink
+      }. Meeting is scheduled for ${DateHelpers.readableDate(
+        appointment.date,
+      )}`,
+    });
+  }
+
+  async sendAppointmentRejectionMail(
+    guest: ProfileInformation,
+    appointment: Appointment,
+  ): Promise<void> {
+    // Mail host of cancellation
+    this.sendMail({
+      from: env.APP_EMAIL,
+      to: appointment.host.user.email,
+      subject: `Appointment rejected!`,
+      text: `${guest.user.firstName} rejected your appointment on "${appointment.title}."`,
+    });
+
+    // Mail guest of rejection action
+    this.sendMail({
+      from: env.APP_EMAIL,
+      to: guest.user.email,
+      subject: `You rejected appointment with ${appointment.host.user.firstName}`,
+      text: `You successfully cancelled out on "${appointment.title}".`,
     });
   }
 }

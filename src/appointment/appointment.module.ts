@@ -7,6 +7,7 @@ import { ProfileInformation } from 'src/user/profile-information/entities/profil
 import { EmailModule } from 'src/notification/email/email.module';
 import { GoogleService } from './providers/google.service';
 import { FsService } from 'src/file/services/fs.service';
+import { AppointmentActionController } from './appointment-action.controller';
 
 @Module({
   imports: [
@@ -14,6 +15,6 @@ import { FsService } from 'src/file/services/fs.service';
     EmailModule,
   ],
   providers: [AppointmentService, GoogleService, FsService],
-  controllers: [AppointmentController],
+  controllers: [AppointmentController, AppointmentActionController],
 })
 export class AppointmentModule {}

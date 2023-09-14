@@ -166,7 +166,7 @@ export class CategoryService {
       const order = {
         createdAt: orderBy || 'DESC',
       };
-      let categories: Category[] = [];
+      let categories: any = [];
       let totalCount = 0;
 
       const findOptions: FindManyOptions<FarmCategory> = {
@@ -184,18 +184,31 @@ export class CategoryService {
       }
       findOptions.where = whereOptions;
       const [data, count] = await this.categoryRepo.findAndCount(findOptions);
-      categories = data.map((category) => {
-        return {
-          ...category,
-          subCategories: data.filter((cate) => cate.categoryId === category.id),
-        };
-      });
+      categories = data;
+      // categories = data.map((category) => {
+      //   return {
+      //     ...category,
+      //     subCategories: data.filter((cate) => cate.categoryId === category.id),
+      //   };
+      // });
 
       if (group && DataHelpers.stringToBool(group) === true) {
-        categories = categories.filter((cate) => !cate.categoryId);
+        // categories = categories.filter((cate) => !cate.categoryId);
+        categories = categories
+          .map((category) => {
+          if (!category.categoryId) {
+            return {
+              ...category,
+              subCategories: categories.filter(
+                (cate) => cate.categoryId === category.id,
+              ),
+            };
+          }
+        }).filter(Boolean);
       }
 
-      totalCount = count;
+      totalCount = categories.length;
+      // totalCount = count;
 
       return {
         page,

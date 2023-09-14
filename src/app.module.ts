@@ -14,6 +14,7 @@ import { InvitesModule } from './invites/invites.module';
 import { AppointmentModule } from './appointment/appointment.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { NotificationModule } from './notification/notification.module';
+import { FarmModule } from './farm/farm.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { NotificationModule } from './notification/notification.module';
     InvitesModule,
     AppointmentModule,
     NotificationModule,
+    FarmModule,
   ],
   controllers: [AppController],
   providers: [

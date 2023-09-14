@@ -17,6 +17,7 @@ import {
 import { ProfileType } from '../enums/profile-information.enum';
 import { EProfileStatus } from '../enums/profile-status.enum';
 import { ProfileReview } from './profile-review.entity';
+import { FarmCategory } from 'src/farm/category/entities/category.entity';
 
 @Entity()
 export class ProfileInformation {
@@ -61,6 +62,9 @@ export class ProfileInformation {
     eager: true,
   })
   user: User;
+
+  @OneToMany(() => FarmCategory, (category) => category)
+  specializesIn: FarmCategory[];
 
   @Column({ nullable: true })
   userId: number;

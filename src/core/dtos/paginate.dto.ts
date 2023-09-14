@@ -86,4 +86,12 @@ export class PaginateDto {
   @IsOptional()
   @IsString()
   profileType?: string;
+
+  @IsOptional()
+  @IsString()
+  group?: string;
+
+  @IsOptional()
+  @IsString()
+  active?: string;
 }

@@ -9,6 +9,7 @@ import { CreateProfileInformationInput } from './dtos/create-profile-information
 import { UpdateProfileInformationInput } from './dtos/update-profile-information.input';
 import { ProfileInformation } from './entities/profile-information.entity';
 import { ProfileType } from './enums/profile-information.enum';
+import { CategoryService } from 'src/farm/category/category.service';
 
 @Injectable()
 export class ProfileInformationService {
@@ -18,14 +19,29 @@ export class ProfileInformationService {
     private readonly profileRepo: Repository<ProfileInformation>,
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
+    private readonly categoryService: CategoryService,
   ) {
     this.logger = new Logger(ProfileInformationService.name);
   }
   async create(
     user: User,
-    createProfileInformationInput?: CreateProfileInformationInput,
+    {
+      categoryIds,
+      ...createProfileInformationInput
+    }: CreateProfileInformationInput,
   ): Promise<ProfileInformation> {
     try {
+      if (!categoryIds.length) {
+        throw new HttpException(
+          'CategoryIds cannot be empty',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const categories = await this.categoryService.getCategoriesByIds(
+        categoryIds,
+      );
+
       const profiles = await this.profileRepo.find({});
       const phoneExist = profiles.find(
         (profile) => profile.phone === createProfileInformationInput.phone,
@@ -68,6 +84,7 @@ export class ProfileInformationService {
       let profile = this.profileRepo.create({
         user: _user,
         regionId: user.region.id,
+        specializesIn: categories,
         ...createProfileInformationInput,
       });
       profile = { ...profile, ...createProfileInformationInput };

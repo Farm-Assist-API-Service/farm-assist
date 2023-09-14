@@ -9,15 +9,16 @@ import {
   IsString,
   MinLength,
   IsOptional,
+  IsArray,
+  ValidateNested,
+  IsNumber,
 } from 'class-validator';
 
 import { ProfileInformation } from '../entities/profile-information.entity';
 
 import { ProfileType } from '../enums/profile-information.enum';
 
-export class CreateProfileInformationInput
-  implements Partial<ProfileInformation>
-{
+export class CreateProfileInformationInput implements Partial<ProfileInformation> {
   @IsEnum(ProfileType)
   @IsOptional()
   readonly profileType?: ProfileType = ProfileType.REGULAR;
@@ -39,4 +40,8 @@ export class CreateProfileInformationInput
   @IsString()
   @IsOptional()
   fcmToken?: string;
+
+  @IsArray()
+  @IsNumber({}, { each: true })
+  categoryIds?: number[];
 }

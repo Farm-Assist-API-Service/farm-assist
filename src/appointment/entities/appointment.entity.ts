@@ -66,6 +66,11 @@ export class Appointment {
     cancelledAt: Date;
   };
 
+  @Column('simple-json', { nullable: true, default: null })
+  metaData: {
+    channelName: string;
+  };
+
   @Column()
   readonly date: Date;
 

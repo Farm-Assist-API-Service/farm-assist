@@ -1,11 +1,13 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Put,
   Query,
@@ -26,6 +28,8 @@ import { AppointmentService } from './appointment.service';
 import { CancelAppointmentDto } from './dtos/cancel-appointment.dto';
 import { CreateAppointmentDto } from './dtos/create-appointment.dto';
 import { Appointment } from './entities/appointment.entity';
+import { Roles } from 'src/utils/decorators/roles.decorator';
+import { UserRoles } from 'src/core/enums/roles.enum';
 
 @Controller('api/appointments')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -70,5 +74,19 @@ export class AppointmentController {
       profile,
       inputs,
     );
+  }
+
+  @Roles(UserRoles.ADMIN)
+  @Delete()
+  async deleteAllAppointments() {
+    this.appointmentService.deleteAll();
+  }
+
+  @Patch(':appointmentId/join')
+  joinAppointment(
+    @LoggedInProfile() profile: ProfileInformation,
+    @Param('appointmentId', ParseIntPipe) appointmentId: number,
+  ) {
+    return this.appointmentService.joinAppointment(profile, appointmentId);
   }
 }

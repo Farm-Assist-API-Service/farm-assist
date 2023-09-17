@@ -17,6 +17,7 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 import { ProfileInformation } from 'src/user/profile-information/entities/profile-information.entity';
 import { EmailModule } from 'src/notification/email/email.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { GoogleService } from 'src/appointment/providers/google.service';
 
 @Module({
   imports: [
@@ -43,7 +44,13 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     JwtModule,
     EmailModule,
   ],
-  providers: [AuthService, RegionService, UserService, JwtStrategy],
+  providers: [
+    AuthService,
+    RegionService,
+    UserService,
+    JwtStrategy,
+    GoogleService,
+  ],
   controllers: [AuthController],
 })
 export class AuthModule {}

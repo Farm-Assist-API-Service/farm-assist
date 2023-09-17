@@ -15,8 +15,8 @@ export class FsService {
     this.logger = new Logger(FsService.name);
   }
 
-  writeFile(json: object): Promise<string> {
-    const resolvedPath = resolve('/');
+  writeFile(filePath: string, json: object): Promise<string> {
+    const resolvedPath = resolve(filePath);
     // return Promise.resolve(resolvedPath);
     return new Promise((resolve, reject) => {
       fs.writeFile(
@@ -51,8 +51,6 @@ export class FsService {
 
   readFile(filePath: string): Promise<string> {
     const resolvedPath = resolve(filePath);
-    console.log({ resolvedPath });
-
     // return Promise.resolve(resolvedPath);
     return new Promise((resolve, reject) => {
       fs.readFile(resolvedPath, 'ascii', (err, data) => {

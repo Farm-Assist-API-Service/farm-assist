@@ -10,6 +10,7 @@ import {
   IEmailService,
   MailOptions,
   EMailSource,
+  IFailedOauthTokenMail,
 } from 'src/notification/interfaces/email.interfaces';
 import { User } from 'src/user/user.entity';
 import { otpTemplate } from 'src/view/emails/otp';
@@ -22,6 +23,7 @@ import { GenAppLinks } from 'src/appointment/interfaces/appointment.service.inte
 import { AesEncryption } from 'src/utils/helpers/aes-encryption';
 import { EAppointmentActions } from 'src/appointment/enums/appointment-actions.enum';
 import { DateHelpers } from 'src/utils/helpers/date.helpers';
+import { FarmAssistAppointmentProviders } from 'src/appointment/enums/appointment-providers.enum';
 
 const ReadFile = promisify(readFile);
 
@@ -217,6 +219,8 @@ export class Nodemailer implements IEmailService {
     appointment: Appointment,
   ): Promise<void> {
     // Mail host of acceptance
+    console.log({ guest });
+    
     this.sendMail({
       from: env.APP_EMAIL,
       to: appointment.host.user.email,
@@ -257,6 +261,17 @@ export class Nodemailer implements IEmailService {
       to: guest.user.email,
       subject: `You rejected appointment with ${appointment.host.user.firstName}`,
       text: `You successfully cancelled out on "${appointment.title}".`,
+    });
+  }
+
+  async sendFailedTokenGenerationMail(
+    inputs: IFailedOauthTokenMail,
+  ): Promise<void> {
+    this.sendMail({
+      from: `<${env.APP_EMAIL}>`,
+      to: env.APP_EMAIL,
+      subject: inputs.subject,
+      text: inputs.message,
     });
   }
 }

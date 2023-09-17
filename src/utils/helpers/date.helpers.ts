@@ -1,9 +1,11 @@
 import * as moment from 'moment';
 
 type U = 'days' | 'weeks' | 'years';
+type NumStr = number | string;
 
 export const DEFAULT_DATE_FORMAT = 'DD/MM/YYYY';
 export const YEAR_MONTH_DAY_DATE_FORMAT = 'YYYY-MM-DD';
+// export const YEAR_MONTH_DAY_DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:MM:SS';
 export const HOUR_MIN_SEC_TIME_FORMAT = 'HH:mm:ss';
 export const DAY_MONTH_DATE_YEAR_TIME_FORMAT = 'LLLL';
 
@@ -15,6 +17,14 @@ export type Format =
 export class DateHelpers {
   static now(timestamp?: boolean): moment.Moment | number {
     return (timestamp && Date.now()) || moment();
+  }
+
+  static toISOString(date: Date | string): string {
+    return moment(date).toISOString();
+  }
+
+  static getTimestamp(date: Date | string): number {
+    return moment(date).unix();
   }
 
   static diffBtwDates(
@@ -86,16 +96,22 @@ export class DateHelpers {
     return moment(date).subtract(1, 'weeks').endOf('week').add(1).toDate();
   }
 
-  static addToDate(date: Date, num: any, unit: string): Date {
-    return moment(date).add(num, unit).toDate();
+  static addToDate(
+    date: Date,
+    amount: NumStr,
+    unit: moment.unitOfTime.DurationConstructor,
+  ): Date {
+    return moment(date)
+      .add(typeof amount === 'string' ? parseInt(amount) + 1 : amount + 1, unit)
+      .toDate();
   }
 
-  static removeFromDate(date: Date, num: any, unit: string): Date {
-    return moment(date).subtract(num, unit).toDate();
+  static removeFromDate(date: Date, amount: any, unit: string): Date {
+    return moment(date).subtract(unit, amount).toDate();
   }
 
-  static subtractDate(date: Date, num: any, unit: string): Date {
-    return moment(date).subtract(num, unit).toDate();
+  static subtractDate(date: Date, amount: any, unit: string): Date {
+    return moment(date).subtract(unit, amount).toDate();
   }
 
   static isFuture(date1: Date, date2: Date): boolean {

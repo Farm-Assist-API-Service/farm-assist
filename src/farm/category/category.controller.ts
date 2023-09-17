@@ -20,6 +20,8 @@ import { Category } from './interfaces';
 import { PaginateDto } from 'src/core/dtos/paginate.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { UserRoles } from 'src/core/enums/roles.enum';
+import { Roles } from 'src/utils/decorators/roles.decorator';
 
 @Controller('api/farm')
 @UseInterceptors(TransformInterceptor)
@@ -29,6 +31,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 export class CategoryController {
   constructor(private categoryService: CategoryService) {}
 
+  // @Roles(UserRoles.ADMIN)
   @Post('category')
   create(@Body() inputs: CreateCategoryDto): Promise<FarmCategory> {
     return this.categoryService.create(inputs);

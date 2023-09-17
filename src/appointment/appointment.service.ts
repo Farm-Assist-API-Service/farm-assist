@@ -21,6 +21,8 @@ import { EAppointmentStatus } from './enums/appointment-status.enum';
 import { GoogleService } from './providers/google.service';
 import { env } from 'src/config/config.env';
 import { EAppointmentActions } from './enums/appointment-actions.enum';
+import { AgoraService } from './providers/agora.service';
+import { ELocation } from 'src/core/enums/location.enum';
 
 @Injectable()
 export class AppointmentService implements Services {
@@ -36,6 +38,7 @@ export class AppointmentService implements Services {
     private readonly profileRepo: Repository<ProfileInformation>,
     private readonly emailService: EmailEngineFactory,
     private readonly googleService: GoogleService,
+    private readonly agoraService: AgoraService,
   ) {
     this.logger = new Logger(AppointmentService.name);
     this.encryption = new AesEncryption(env.RSA_PRIVATE_KEY);
@@ -86,16 +89,41 @@ export class AppointmentService implements Services {
         }
       });
 
+      let newAppointment: Appointment;
       // TODO: Change to Appointment Provider. Use this one as default
       // inputs.location determines what Meeting provider to use
-      const locationLink = await this.googleService.meet.createMeet(); // Default Meeting Provider
-
-      const newAppointment = this.appointmentRepo.create({
-        ...inputs,
-        host,
-        guests,
-        locationLink,
-      });
+      if (inputs.location === ELocation.AGORA) {
+        const channelName = await this.agoraService.meet.createMeet(
+          inputs,
+          host,
+          guests,
+        ); // Default Meeting Provider
+        newAppointment = this.appointmentRepo.create({
+          ...inputs,
+          host,
+          guests,
+          metaData: {
+            channelName,
+          },
+        });
+      } else if (inputs.location === ELocation.MEET) {
+        const locationLink = await this.googleService.meet.createMeet(
+          inputs,
+          host,
+          guests,
+        );
+        newAppointment = this.appointmentRepo.create({
+          ...inputs,
+          host,
+          guests,
+          locationLink,
+        });
+      } else {
+        throw new HttpException(
+          `${inputs.location} service is unavailable`,
+          HttpStatus.NOT_ACCEPTABLE,
+        );
+      }
 
       this.logger.log('Before appointment creation');
       const appointment = await this.appointmentRepo.save(newAppointment);
@@ -129,6 +157,10 @@ export class AppointmentService implements Services {
 
   findMany(findOneOpt: FindManyOptions): Promise<Appointment[]> {
     return this.appointmentRepo.find(findOneOpt);
+  }
+
+  deleteAll() {
+    this.appointmentRepo.delete({});
   }
 
   async getAllAppointments(
@@ -276,4 +308,31 @@ export class AppointmentService implements Services {
   }
 
   async adjustAppointment(appointment: Appointment): Promise<void> {}
+
+  async joinAppointment(
+    guest: ProfileInformation,
+    appointmentId: number,
+  ): Promise<string> {
+    const appointment = await this.appointmentRepo.findOne({
+      where: {
+        id: appointmentId,
+      },
+      relations: ['guests'],
+    });
+    if (!appointment) {
+      throw new HttpException('Invalid appointment', HttpStatus.BAD_REQUEST);
+    }
+    if (!appointment.guests.find((g) => g.id === guest.id)) {
+      throw new HttpException('Invalid guest', HttpStatus.BAD_REQUEST);
+    }
+    if (ELocation.AGORA === appointment.location) {
+      return this.agoraService.meet.join(guest, appointment);
+    } else {
+      throw new HttpException(
+        `Sorry. ${appointment.location} service is unavailable. Only appointment(s) scheduled on ${ELocation.AGORA} are accepted`,
+        // `${appointment.location} service is unavailable`,
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
+  }
 }

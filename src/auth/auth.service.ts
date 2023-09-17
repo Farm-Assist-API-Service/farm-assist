@@ -34,6 +34,9 @@ import { EmailEngineFactory } from 'src/notification/email/factory';
 import { EmailEngines } from 'src/notification/enums/email-engines.enum';
 import { EmailSource } from 'src/notification/enums/email-source.enum';
 import { otpTemplate } from 'src/view/emails/otp';
+import { FarmAssistAppointmentProviders } from 'src/appointment/enums/appointment-providers.enum';
+import { FsService } from 'src/file/services/fs.service';
+import { GoogleService } from 'src/appointment/providers/google.service';
 
 export type Login = { email: string; phone?: string; password: string };
 
@@ -51,6 +54,8 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly emailService: EmailEngineFactory,
+    private readonly fsService: FsService,
+    private readonly googleService: GoogleService,
   ) {}
 
   private getContactID(identifier: string): GetContactID {
@@ -381,4 +386,43 @@ export class AuthService {
   //   const salt = bcrypt.genSaltSync(saltRounds);
   //   return bcrypt.hashSync(password, salt);
   // }
+
+  async getOauthURL(provider: FarmAssistAppointmentProviders): Promise<string> {
+    try {
+      if (FarmAssistAppointmentProviders.GOOGLE_SERVICE === provider) {
+        return this.googleService.getAuthURL;
+      }
+
+      // Agora
+    } catch (error) {
+      new HandleHttpExceptions({
+        error,
+        source: {
+          service: AuthService.name,
+          operator: this.getOauthURL.name,
+        },
+        report: `Failed to get ${provider} AUTHORIZATION URL`,
+      });
+    }
+  }
+
+  async oauthCallback(
+    provider: FarmAssistAppointmentProviders,
+    code: string,
+  ): Promise<void> {
+    try {
+      if (FarmAssistAppointmentProviders.GOOGLE_SERVICE === provider) {
+        await this.googleService.setAuthCode(code);
+      }
+    } catch (error) {
+      new HandleHttpExceptions({
+        error,
+        source: {
+          service: AuthService.name,
+          operator: this.oauthCallback.name,
+        },
+        report: `Failed to set ${provider} AUTHORIZATION CODE`,
+      });
+    }
+  }
 }

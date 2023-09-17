@@ -1,6 +1,7 @@
 import { Appointment } from 'src/appointment/entities/appointment.entity';
 import { ProfileInformation } from 'src/user/profile-information/entities/profile-information.entity';
 import { User } from 'src/user/user.entity';
+import { FarmAssistAppointmentProviders } from 'src/appointment/enums/appointment-providers.enum';
 
 export type MailOptions = {
   from: string;
@@ -27,6 +28,12 @@ export interface MailAttachment {
   contentType: MailContentTypes;
 }
 
+export interface IFailedOauthTokenMail {
+  message: string;
+  subject?: string;
+  provider: FarmAssistAppointmentProviders;
+}
+
 export interface IEmailService {
   sendMail(inputs: MailOptions): Promise<void>;
   sendOTPMail(user: User): Promise<void>;
@@ -40,4 +47,5 @@ export interface IEmailService {
     guest: ProfileInformation,
     appointment: Appointment,
   ): Promise<void>;
+  sendFailedTokenGenerationMail(inputs: IFailedOauthTokenMail): Promise<void>;
 }

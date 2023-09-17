@@ -104,10 +104,25 @@ class EnvConfig {
   @IsString()
   RSA_PRIVATE_KEY: string;
 
+  @IsString()
+  GOOGLE_CLIENT_ID: string;
+
+  @IsString()
+  GOOGLE_CLIENT_SECRET: string;
+
+  @IsString()
+  GOOGLE_CLIENT_REDIRECT_URL: string;
+
+  @IsString()
+  AGORA_APP_CERTIFICATE: string;
+
+  @IsString()
+  AGORA_APP_ID: string;
+
   static getDefaultObject(): EnvConfig {
     const obj = new EnvConfig();
     obj.NODE_ENV = 'development';
-    obj.APP_EMAIL = 'admin@farmassist.com';
+    obj.APP_EMAIL = process.env.APP_EMAIL || 'farmassite@gmail.com';
     obj.APP_NAME = process.env.APP_NAME || 'Farm Assist';
     obj.APP_BASEL_URL =
       process.env.APP_BASEL_URL || 'https://farm-assist-staging.up.railway.app';
@@ -187,6 +202,12 @@ xRVl/Ml6rIgy7fqQTi9Zxs6/Wv/8PCtDmry4z3zd0j+MbN/rZ7Tbmt9LfjRp0+KCA7VjLa
 T9rxZzYTq2MAAAAPZ3VAZXRhcC0wNXMtTUJQAQIDBA==
 -----END OPENSSH PRIVATE KEY-----
 `;
+    obj.GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+    obj.GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+    obj.GOOGLE_CLIENT_REDIRECT_URL = process.env.GOOGLE_CLIENT_REDIRECT_URL;
+    obj.AGORA_APP_ID = process.env.AGORA_APP_ID;
+    obj.AGORA_APP_CERTIFICATE = process.env.AGORA_APP_CERTIFICATE;
+
     return obj;
   }
 }

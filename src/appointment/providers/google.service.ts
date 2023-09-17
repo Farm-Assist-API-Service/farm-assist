@@ -167,7 +167,7 @@ export class GoogleService {
       .catch((e) => console.log(e));
   }
 
-  @Cron('*/50 * * * * *')
+  @Cron(CronExpression.EVERY_3_HOURS)
   async getAccessToken() {
     const oauth2Client = new OAuth2Client({
       clientId: this.config.env.GOOGLE_CLIENT_ID,

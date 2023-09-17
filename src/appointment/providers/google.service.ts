@@ -146,7 +146,7 @@ export class GoogleService {
             ? 'New Access token generated!!'
             : `Saved Old Access token =====> ${accessToken}`,
         );
-        if (refreshToken.length) {
+        if (refreshToken && refreshToken?.length) {
           this.logger.verbose(`Refresh token saved... ${refreshToken}`);
         }
       })

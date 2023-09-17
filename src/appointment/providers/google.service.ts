@@ -163,6 +163,7 @@ export class GoogleService {
         this.logger.debug(
           `Token status is set to ${String(status).toUpperCase()}`,
         );
+        this.getAccessToken();
       })
       .catch((e) => console.log(e));
   }

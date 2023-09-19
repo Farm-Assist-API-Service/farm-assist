@@ -15,5 +15,6 @@ import { FarmModule } from 'src/farm/farm.module';
   ],
   providers: [ProfileInformationService, ProfileReviewService],
   controllers: [ProfileInformationController],
+  exports: [ProfileInformationService],
 })
 export class ProfileInformationModule {}

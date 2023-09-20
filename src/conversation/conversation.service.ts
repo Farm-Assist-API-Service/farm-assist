@@ -22,17 +22,24 @@ export class ConversationService {
     sender: ProfileInformation,
     sendMessageDto: SendMessageDto,
   ): Promise<any> {
-    const receiver = await this.profileService.getProfilebyID(
+    const recipient = await this.profileService.getProfilebyID(
       sendMessageDto.recipientId,
     );
 
-    if (!receiver) {
+    if (sender.id === recipient.id) {
+      throw new HttpException(
+        'Self messaging not allowed',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+    }
+
+    if (!recipient) {
       throw new HttpException('Invalid receipient', HttpStatus.BAD_REQUEST);
     }
 
     const conversation = await this.findOneByProfileIds({
       senderId: sender.id,
-      receiverId: receiver.id,
+      recipientId: recipient.id,
     });
 
     const chats = [];
@@ -49,9 +56,7 @@ export class ConversationService {
       chats.push(message);
       const newConversation = await this.conRepo.create({
         sender,
-        senderId: sender.id,
-        receiver,
-        receiverId: receiver.id,
+        recipient,
         chats,
       });
       await this.conRepo.save(newConversation);
@@ -77,12 +82,12 @@ export class ConversationService {
 
   findOneByProfileIds(profileIds: {
     senderId: number;
-    receiverId: number;
+    recipientId: number;
   }): Promise<Conversation> {
     return this.conRepo
       .createQueryBuilder('conversation')
-      .where(`conversation.senderId = '${profileIds.senderId}'`)
-      .andWhere(`conversation.receiverId = '${profileIds.receiverId}'`)
+      .where(`conversation.sender.id = '${profileIds.senderId}'`)
+      .andWhere(`conversation.recipient.id = '${profileIds.recipientId}'`)
       .getOne();
   }
 
@@ -91,8 +96,10 @@ export class ConversationService {
   ): Promise<Conversation[]> {
     const conversation = await this.conRepo
       .createQueryBuilder('conversation')
-      .where(`conversation.senderId = '${sender.id}'`)
-      .orWhere(`conversation.receiverId = '${sender.id}'`)
+      .leftJoinAndSelect('conversation.sender', 'sender')
+      .leftJoinAndSelect('conversation.recipient', 'recipient')
+      .where(`sender.id = '${sender.id}'`)
+      .orWhere(`recipient.id = '${sender.id}'`)
       .getMany();
     return this.parseChats(conversation);
   }

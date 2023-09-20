@@ -26,21 +26,11 @@ export class Conversation {
   })
   type: EConversationType;
 
-  @ManyToMany(() => ProfileInformation, (profile) => profile, {
-    // eager: false,
-  })
+  @ManyToOne((type) => ProfileInformation)
   sender: ProfileInformation;
 
-  @Column({ default: null })
-  senderId: number;
-
-  @ManyToMany(() => ProfileInformation, (profile) => profile, {
-    // eager: false,
-  })
-  receiver: ProfileInformation;
-
-  @Column({ default: null })
-  receiverId: number;
+  @ManyToOne((type) => ProfileInformation)
+  recipient: ProfileInformation;
 
   @Column('text', { default: null, array: true })
   chats: string[];

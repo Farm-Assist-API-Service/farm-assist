@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  JoinColumn,
   JoinTable,
   ManyToMany,
   ManyToOne,
@@ -63,14 +64,15 @@ export class ProfileInformation {
   })
   user: User;
 
-  @OneToMany(() => FarmCategory, (category) => category)
+  @ManyToMany(() => FarmCategory, (category) => category, { eager: true })
+  @JoinTable()
   specializesIn: FarmCategory[];
 
   @Column({ nullable: true })
   userId: number;
 
   @OneToMany(() => ProfileReview, (review) => review.profile, {
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
   })
   reviews!: ProfileReview[];
 

@@ -36,7 +36,8 @@ export class SignInInput implements Partial<User> {
   readonly signature?: string;
 
   @IsEnum(ProfileType)
-  readonly profileType: ProfileType;
+  @IsOptional()
+  readonly profileType?: ProfileType;
 }
 
 export class SignInAsUserInput implements Partial<User> {

@@ -7,6 +7,7 @@ import { User } from '../user.entity';
 import { ProfileReviewService } from './profile-review.service';
 import { ProfileReview } from './entities/profile-review.entity';
 import { FarmModule } from 'src/farm/farm.module';
+import { ProfileInformationControllerExtension } from './profile-information.controller.extension';
 
 @Module({
   imports: [
@@ -14,7 +15,10 @@ import { FarmModule } from 'src/farm/farm.module';
     FarmModule,
   ],
   providers: [ProfileInformationService, ProfileReviewService],
-  controllers: [ProfileInformationController],
+  controllers: [
+    ProfileInformationController,
+    ProfileInformationControllerExtension,
+  ],
   exports: [ProfileInformationService],
 })
 export class ProfileInformationModule {}

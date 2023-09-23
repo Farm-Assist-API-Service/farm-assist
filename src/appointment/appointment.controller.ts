@@ -35,7 +35,7 @@ import { UserRoles } from 'src/core/enums/roles.enum';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @UseInterceptors(TransformInterceptor)
 @UseInterceptors(LoggingInterceptor)
-// @UseFilters(HttpExceptionFilter)
+@UseFilters(HttpExceptionFilter)
 export class AppointmentController {
   constructor(private appointmentService: AppointmentService) {}
   @Post()

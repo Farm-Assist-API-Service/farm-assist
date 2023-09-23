@@ -1,5 +1,5 @@
 export class EnumHelpers {
-  static enumToPlainText(CurrencyOptions): string {
-    return `Enums: ${Object.values(CurrencyOptions)}`.replace(/,/gi, ' | ');
+  static enumToPlainText(enumObj): string {
+    return `Enums: ${Object.values(enumObj)}`.replace(/,/gi, ' | ');
   }
 }

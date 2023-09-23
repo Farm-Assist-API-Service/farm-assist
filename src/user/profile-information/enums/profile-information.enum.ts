@@ -1,5 +1,5 @@
 export enum ProfileType {
-  REGULAR = 'regular',
+  REGULAR = 'regular', // TODO remove regular
   FARMER = 'farmer',
   CONSULTANT = 'consultant',
 }

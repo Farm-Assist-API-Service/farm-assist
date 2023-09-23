@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ConversationService } from './conversation.service';
 import { LoggedInProfile } from 'src/utils/decorators/logged-in-profile.decorator';
 import { ProfileInformation } from 'src/user/profile-information/entities/profile-information.entity';
@@ -11,11 +11,13 @@ import { IChat } from './interfaces';
 import { SendMessageDto } from './dtos/send-message-dto';
 import { UserRoles } from 'src/core/enums/roles.enum';
 import { Roles } from 'src/utils/decorators/roles.decorator';
+import { HttpExceptionFilter } from 'src/utils/filters/http-exception.filter';
 
 @Controller('api/conversations')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @UseInterceptors(TransformInterceptor)
 @UseInterceptors(LoggingInterceptor)
+@UseFilters(HttpExceptionFilter)
 export class ConversationController {
   constructor(private conversationService: ConversationService) {}
 

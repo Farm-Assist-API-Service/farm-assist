@@ -4,6 +4,7 @@ import { HandleHttpExceptions } from 'src/utils/helpers/handle-http-exceptions';
 import { GetContactID } from 'src/utils/helpers/user';
 import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import { User } from './user.entity';
+import { VerifyUserInformationInput } from './dtos/verify-user-information';
 
 @Injectable()
 export class UserService {
@@ -96,6 +97,45 @@ export class UserService {
           operator: this.verifyUserAccount.name,
         },
         report: 'Error Verifying User Account',
+      });
+    }
+  }
+
+  async verifyUserInformation(inputs: VerifyUserInformationInput): Promise<{
+    availability: boolean;
+  }> {
+    const fieldsAsStr = inputs;
+    try {
+      const findOptions: FindManyOptions<User> = {};
+      const whereOptions: any = {};
+
+      if (!inputs.email && !inputs.phone) {
+        throw new HttpException(
+          'Only email & phone fields can be verified on v1',
+          HttpStatus.NOT_ACCEPTABLE,
+        );
+      }
+       if (inputs.email) {
+         whereOptions['email'] = inputs.email;
+       }
+
+       if (inputs.phone) {
+         whereOptions['phone'] = inputs.phone;
+       }
+
+      findOptions.where = whereOptions;
+      const [data, count] = await this.userRepo.find(findOptions);
+      return {
+        availability: !data,
+      };
+    } catch (error) {
+      new HandleHttpExceptions({
+        error,
+        source: {
+          service: UserService.name,
+          operator: this.verifyUserInformation.name,
+        },
+        report: `Error verifying "${fieldsAsStr}" in user information`,
       });
     }
   }

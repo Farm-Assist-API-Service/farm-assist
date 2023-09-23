@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginateDto } from 'src/core/dtos/paginate.dto';
 import { HandleHttpExceptions } from 'src/utils/helpers/handle-http-exceptions';
-import { FindManyOptions, getRepository, Repository } from 'typeorm';
+import { FindManyOptions, FindOneOptions, getRepository, Repository } from 'typeorm';
 import { User } from '../user.entity';
 import { UserService } from '../user.service';
 import { CreateProfileInformationInput } from './dtos/create-profile-information.input';
@@ -10,6 +10,7 @@ import { UpdateProfileInformationInput } from './dtos/update-profile-information
 import { ProfileInformation } from './entities/profile-information.entity';
 import { ProfileType } from './enums/profile-information.enum';
 import { CategoryService } from 'src/farm/category/category.service';
+import { VerifyProfileInformationInput } from './dtos/verify-profile-information';
 
 @Injectable()
 export class ProfileInformationService {
@@ -294,6 +295,43 @@ export class ProfileInformationService {
           operator: this.updateProfile.name,
         },
         report: 'Error updating profile',
+      });
+    }
+  }
+
+  async verifyProfileInformation(
+    inputs: VerifyProfileInformationInput,
+  ): Promise<{
+    availability: boolean;
+  }> {
+    const fieldsAsStr = inputs;
+    try {
+      const findOptions: FindManyOptions<ProfileInformation> = {};
+      const whereOptions: any = {};
+
+      if (inputs.name) {
+        whereOptions['name'] = inputs.name;
+      } else if (inputs.phone) {
+        whereOptions['phone'] = inputs.phone;
+      } else {
+        throw new HttpException(
+          'Only name & phone field can be verified on v1',
+          HttpStatus.NOT_ACCEPTABLE,
+        );
+      }
+      findOptions.where = whereOptions;
+      const [data, count] = await this.profileRepo.find(findOptions);
+      return {
+        availability: !data,
+      };
+    } catch (error) {
+      new HandleHttpExceptions({
+        error,
+        source: {
+          service: ProfileInformationService.name,
+          operator: this.verifyProfileInformation.name,
+        },
+        report: `Error verifying "${fieldsAsStr}" in profile information`,
       });
     }
   }

@@ -110,13 +110,13 @@ export class AuthService {
       });
       const newUser = await this.userRepo.save(userInput);
 
-      const defaultProfile = this.profileRepo.create({
-        profileType: ProfileType.REGULAR,
-        user: newUser,
-        userId: newUser.id,
-      });
+      // const defaultProfile = this.profileRepo.create({
+      //   profileType: ProfileType.REGULAR,
+      //   user: newUser,
+      //   userId: newUser.id,
+      // });
 
-      await this.profileRepo.save(defaultProfile);
+      // await this.profileRepo.save(defaultProfile);
       await this.emailService
         .findOne(EmailEngines.NODE_MAILER)
         .sendOTPMail(newUser);
@@ -135,27 +135,34 @@ export class AuthService {
 
   async signIn(signInInput: SignInInput): Promise<SignInResult> {
     try {
-      let user: User;
+      let user: User, profile: ProfileInformation;
       const ContactID = UserHelpers.ContactInformation.getContactId(
         signInInput.identifier,
       );
 
       try {
-        user = signInInput.deviceId
-          ? await this.userRepo
-              .createQueryBuilder('user')
-              .leftJoinAndSelect('user.profileInformation', 'profile')
-              .leftJoinAndSelect('user.invite', 'invite')
-              .where(`profile.deviceId = '${signInInput.deviceId}'`)
-              .andWhere(`profile.profileType = '${signInInput.profileType}'`)
-              .getOne()
-          : await this.userRepo
-              .createQueryBuilder('user')
-              .leftJoinAndSelect('user.profileInformation', 'profile')
-              .leftJoinAndSelect('user.invite', 'invite')
-              .where(ContactID)
-              .andWhere(`profile.profileType = '${signInInput.profileType}'`)
-              .getOne();
+        if (signInInput.profileType) {
+          user = signInInput.deviceId
+            ? await this.userRepo
+                .createQueryBuilder('user')
+                .leftJoinAndSelect('user.profileInformation', 'profile')
+                .leftJoinAndSelect('user.invite', 'invite')
+                .where(`profile.deviceId = '${signInInput.deviceId}'`)
+                .andWhere(`profile.profileType = '${signInInput.profileType}'`)
+                .getOne()
+            : await this.userRepo
+                .createQueryBuilder('user')
+                .leftJoinAndSelect('user.profileInformation', 'profile')
+                .leftJoinAndSelect('user.invite', 'invite')
+                .where(ContactID)
+                .andWhere(`profile.profileType = '${signInInput.profileType}'`)
+                .getOne();
+        } else {
+          user = await this.userRepo
+            .createQueryBuilder('user')
+            .where(ContactID)
+            .getOne();
+        }
       } catch (error) {
         throw new HandleHttpExceptions({
           error,
@@ -207,7 +214,7 @@ export class AuthService {
       };
       // const refreshToken = this.issueRefreshToken(payload);
       if (signInInput.profileType) {
-        const profile = user.profileInformation.find(
+        profile = user.profileInformation.find(
           (each) =>
             each.profileType ===
             ProfileType[signInInput.profileType.toUpperCase()],
@@ -223,7 +230,7 @@ export class AuthService {
       };
 
       Object.assign(output, {
-        profileType: signInInput.profileType,
+        profileType: profile ? signInInput.profileType : null,
         token,
         refreshToken: '', // TODO: Refreh token
       });

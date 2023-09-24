@@ -16,6 +16,7 @@ import { IFailedOauthTokenMail } from 'src/notification/interfaces/email.interfa
 import { FarmAssistAppointmentProviders } from '../enums/appointment-providers.enum';
 import { StringHelpers } from 'src/utils/helpers/string';
 import { Appointment } from '../entities/appointment.entity';
+import { AgoraRoles, EAgoraRoles } from '../enums/providers.roles.enum';
 
 interface IAgoraConfig {
   appId: string;
@@ -71,27 +72,28 @@ class AgoraMeet {
     return channelName;
   }
 
-  async join(
-    guest: ProfileInformation,
+  async generateToken(
+    pid: number,
     appointment: Appointment,
+    role: AgoraRoles,
   ): Promise<string> {
     const config = this.agoraService.appConfig;
     let channelName = appointment.metaData.channelName;
-    const uid = guest.id;
-    const role = RtcRole.PUBLISHER;
+    const userRole = RtcRole[role];
     const currentDate = DateHelpers.addToDate(
       appointment.date,
       appointment.duration,
       appointment.unitOfTime,
     );
+
     const privilegeExpiredTs = DateHelpers.getTimestamp(currentDate);
     channelName = `${channelName}-${privilegeExpiredTs}`;
     return RtcTokenBuilder.buildTokenWithUid(
       config.appId,
       config.appCertificate,
       channelName,
-      uid,
-      role,
+      pid,
+      userRole,
       privilegeExpiredTs,
     );
   }

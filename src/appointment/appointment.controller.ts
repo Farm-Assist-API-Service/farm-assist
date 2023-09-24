@@ -49,7 +49,9 @@ export class AppointmentController {
 
   @Get()
   getAppointments(): Promise<Appointment[]> {
-    return this.appointmentService.getAllAppointments();
+    return this.appointmentService.getAllAppointments({
+      relations: ['guests', 'host'],
+    });
   }
 
   @Get()

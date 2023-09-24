@@ -86,13 +86,14 @@ class AgoraMeet {
       appointment.unitOfTime,
     );
 
+    const uid = 0;
     const privilegeExpiredTs = DateHelpers.getTimestamp(currentDate);
     channelName = `${channelName}-${privilegeExpiredTs}`;
     return RtcTokenBuilder.buildTokenWithUid(
       config.appId,
       config.appCertificate,
       channelName,
-      pid,
+      uid,
       userRole,
       privilegeExpiredTs,
     );

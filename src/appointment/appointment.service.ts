@@ -322,9 +322,9 @@ export class AppointmentService implements Services {
     if (!appointment) {
       throw new HttpException('Invalid appointment', HttpStatus.BAD_REQUEST);
     }
-    if (!appointment.guests.find((g) => g.id === guest.id)) {
-      throw new HttpException('Invalid guest', HttpStatus.BAD_REQUEST);
-    }
+    // if (!appointment.guests.find((g) => g.id === guest.id)) {
+    //   throw new HttpException('Invalid guest', HttpStatus.BAD_REQUEST);
+    // }
     if (ELocation.AGORA === appointment.location) {
       return this.agoraService.meet.join(guest, appointment);
     } else {

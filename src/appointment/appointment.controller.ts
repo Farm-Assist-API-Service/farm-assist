@@ -84,11 +84,27 @@ export class AppointmentController {
     this.appointmentService.deleteAll();
   }
 
-  @Patch(':appointmentId/join')
-  joinAppointment(
-    @LoggedInProfile() profile: ProfileInformation,
+  @Patch('host/:appointmentId')
+  hostAppointment(
+    @LoggedInProfile() host: ProfileInformation,
     @Param('appointmentId', ParseIntPipe) appointmentId: number,
   ) {
-    return this.appointmentService.joinAppointment(profile, appointmentId);
+    return this.appointmentService.generateAgoraToken(
+      host,
+      appointmentId,
+      'HOST',
+    );
+  }
+
+  @Patch('join/:appointmentId')
+  joinAppointment(
+    @LoggedInProfile() guest: ProfileInformation,
+    @Param('appointmentId', ParseIntPipe) appointmentId: number,
+  ) {
+    return this.appointmentService.generateAgoraToken(
+      guest,
+      appointmentId,
+      'GUEST',
+    );
   }
 }

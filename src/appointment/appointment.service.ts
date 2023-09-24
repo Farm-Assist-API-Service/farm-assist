@@ -23,6 +23,11 @@ import { env } from 'src/config/config.env';
 import { EAppointmentActions } from './enums/appointment-actions.enum';
 import { AgoraService } from './providers/agora.service';
 import { ELocation } from 'src/core/enums/location.enum';
+import { EAgoraRoles } from './enums/providers.roles.enum';
+import {
+  EStreamRoles,
+  StreamRoles,
+} from './interfaces/appointment.service.interfaces';
 
 @Injectable()
 export class AppointmentService implements Services {
@@ -309,30 +314,59 @@ export class AppointmentService implements Services {
 
   async adjustAppointment(appointment: Appointment): Promise<void> {}
 
-  async joinAppointment(
-    guest: ProfileInformation,
+  async generateAgoraToken(
+    profile: ProfileInformation,
     appointmentId: number,
+    role: StreamRoles,
   ): Promise<string> {
-    const appointment = await this.appointmentRepo.findOne({
-      where: {
-        id: appointmentId,
-      },
-      relations: ['guests'],
-    });
-    if (!appointment) {
-      throw new HttpException('Invalid appointment', HttpStatus.BAD_REQUEST);
-    }
-    // if (!appointment.guests.find((g) => g.id === guest.id)) {
-    //   throw new HttpException('Invalid guest', HttpStatus.BAD_REQUEST);
-    // }
-    if (ELocation.AGORA === appointment.location) {
-      return this.agoraService.meet.join(guest, appointment);
-    } else {
-      throw new HttpException(
-        `Sorry. ${appointment.location} service is unavailable. Only appointment(s) scheduled on ${ELocation.AGORA} are accepted`,
-        // `${appointment.location} service is unavailable`,
-        HttpStatus.NOT_ACCEPTABLE,
-      );
+    try {
+      const appointment = await this.appointmentRepo.findOne({
+        where: {
+          id: appointmentId,
+        },
+        relations: ['host', 'guests'],
+      });
+
+      if (!appointment) {
+        throw new HttpException('Invalid appointment', HttpStatus.BAD_REQUEST);
+      }
+
+      if (ELocation.AGORA === appointment.location) {
+        if (EStreamRoles[role] === EStreamRoles.HOST) {
+          if (profile.id !== appointment.host.id) {
+            throw new HttpException('Invalid host', HttpStatus.NOT_ACCEPTABLE);
+          }
+          return this.agoraService.meet.generateToken(
+            profile.id,
+            appointment,
+            'PUBLISHER',
+          );
+        } else {
+          const guest = appointment.guests.find((g) => g.id === profile.id);
+          if (!guest) {
+            throw new HttpException('Invalid guest', HttpStatus.NOT_ACCEPTABLE);
+          }
+          return this.agoraService.meet.generateToken(
+            profile.id,
+            appointment,
+            'SUBSCRIBER',
+          );
+        }
+      } else {
+        throw new HttpException(
+          `Sorry. ${appointment.location} service is unavailable. Only appointment(s) scheduled on ${ELocation.AGORA} are accepted`,
+          HttpStatus.NOT_ACCEPTABLE,
+        );
+      }
+    } catch (error) {
+      new HandleHttpExceptions({
+        error,
+        source: {
+          service: AppointmentService.name,
+          operator: this.generateAgoraToken.name,
+        },
+        report: 'Error generating token for appointment',
+      });
     }
   }
 }

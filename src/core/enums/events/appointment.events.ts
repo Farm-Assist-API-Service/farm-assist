@@ -3,4 +3,5 @@ export enum AppointmentEvents {
   ACCEPT = 'appointment.accept',
   REJECT = 'appointment.reject',
   CANCEL = 'appointment.cancel',
+  STARTED = 'appointment.started',
 }

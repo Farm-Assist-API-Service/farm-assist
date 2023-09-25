@@ -91,7 +91,6 @@ class AgoraMeet {
     const uid = agoraPayloadDto.uid || 0;
     const privilegeExpiredTs = DateHelpers.getTimestamp(currentDate);
     // channelName = `${channelName}-${privilegeExpiredTs}`;
-    console.log({channelName, userRole, uid});
     
     return RtcTokenBuilder.buildTokenWithUid(
       config.appId,

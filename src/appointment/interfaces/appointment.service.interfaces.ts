@@ -5,6 +5,18 @@ export enum EStreamRoles {
   GUEST = 'GUEST',
 }
 
+export interface IJoinAppointment {
+  appointmentName: string;
+  host: {
+    email: string;
+    firstName: string;
+  };
+  guestsMail: string[];
+  message: string;
+  subject: string;
+  deeplink?: string;
+}
+
 export type StreamRoles = keyof typeof EStreamRoles;
 
 export type GenAppLinks = {

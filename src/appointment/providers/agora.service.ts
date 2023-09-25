@@ -17,6 +17,7 @@ import { FarmAssistAppointmentProviders } from '../enums/appointment-providers.e
 import { StringHelpers } from 'src/utils/helpers/string';
 import { Appointment } from '../entities/appointment.entity';
 import { AgoraRoles, EAgoraRoles } from '../enums/providers.roles.enum';
+import { AgoraPayloadDto } from '../dtos/agora-payload.dto';
 
 interface IAgoraConfig {
   appId: string;
@@ -73,7 +74,7 @@ class AgoraMeet {
   }
 
   async generateToken(
-    pid: number,
+    agoraPayloadDto: AgoraPayloadDto,
     appointment: Appointment,
     role: AgoraRoles,
   ): Promise<string> {
@@ -86,7 +87,7 @@ class AgoraMeet {
       appointment.unitOfTime,
     );
 
-    const uid = 0;
+    const uid = agoraPayloadDto.uid || 0;
     const privilegeExpiredTs = DateHelpers.getTimestamp(currentDate);
     channelName = `${channelName}-${privilegeExpiredTs}`;
     return RtcTokenBuilder.buildTokenWithUid(

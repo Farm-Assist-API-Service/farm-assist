@@ -28,6 +28,7 @@ import {
   EStreamRoles,
   StreamRoles,
 } from './interfaces/appointment.service.interfaces';
+import { AgoraPayloadDto } from './dtos/agora-payload.dto';
 
 @Injectable()
 export class AppointmentService implements Services {
@@ -315,9 +316,9 @@ export class AppointmentService implements Services {
   async adjustAppointment(appointment: Appointment): Promise<void> {}
 
   async generateAgoraToken(
+    agoraPayloadDto: AgoraPayloadDto,
     profile: ProfileInformation,
     appointmentId: number,
-    role: StreamRoles,
   ): Promise<string> {
     try {
       const appointment = await this.appointmentRepo.findOne({
@@ -332,22 +333,24 @@ export class AppointmentService implements Services {
       }
 
       if (ELocation.AGORA === appointment.location) {
-        if (EStreamRoles[role] === EStreamRoles.HOST) {
-          if (profile.id !== appointment.host.id) {
+        if (EStreamRoles[agoraPayloadDto.role] === EStreamRoles.HOST) {
+          if (agoraPayloadDto.uid !== appointment.host.id) {
             throw new HttpException('Invalid host', HttpStatus.NOT_ACCEPTABLE);
           }
           return this.agoraService.meet.generateToken(
-            profile.id,
+            agoraPayloadDto,
             appointment,
             'PUBLISHER',
           );
         } else {
-          const guest = appointment.guests.find((g) => g.id === profile.id);
+          const guest = appointment.guests.find(
+            (g) => g.id === agoraPayloadDto.uid,
+          );
           if (!guest) {
             throw new HttpException('Invalid guest', HttpStatus.NOT_ACCEPTABLE);
           }
           return this.agoraService.meet.generateToken(
-            profile.id,
+            agoraPayloadDto,
             appointment,
             'SUBSCRIBER',
           );

@@ -282,7 +282,7 @@ export class Nodemailer implements IEmailService {
       subject: `${iJoinAppointment.host.firstName} started an appointment.`,
       // text: `Join "${iJoinAppointment.appointmentName}" here:  farmassist://farmassist.app/appointment?id=`,
       text: `"${iJoinAppointment.appointmentName}"`,
-      link: `${env.APP_BASEL_URL}/farmassist?link=farmassist://farmassist.app/appointment?id=`,
+      link: `${env.APP_BASEL_URL}/farmassist?link=farmassist://farmassist.app/appointment?id=${iJoinAppointment.appointmentId}`,
     };
 
     const template = await this.getEmailTemplate('join-appointment', payload);

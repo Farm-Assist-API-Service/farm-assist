@@ -346,6 +346,7 @@ export class AppointmentService implements Services {
 
           const joinAppointment: Partial<IJoinAppointment> = {
             appointmentName: appointment.title,
+            appointmentId,
             host: {
               email: appointment.host.user.email,
               firstName: appointment.host.user.firstName,

@@ -7,6 +7,7 @@ export enum EStreamRoles {
 
 export interface IJoinAppointment {
   appointmentName: string;
+  appointmentId: number;
   host: {
     email: string;
     firstName: string;

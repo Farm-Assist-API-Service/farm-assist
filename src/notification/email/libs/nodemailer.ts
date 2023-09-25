@@ -35,7 +35,7 @@ export class Nodemailer implements IEmailService {
   constructor(
     private readonly gene,
     private eventEmitter: EventEmitter2,
-    private readonly configService: ConfigService,
+    private configService: ConfigService,
     private readonly encryption: AesEncryption,
   ) {
     this.transporter = nodemailer.createTransport({
@@ -282,7 +282,7 @@ export class Nodemailer implements IEmailService {
       subject: `${iJoinAppointment.host.firstName} started an appointment.`,
       // text: `Join "${iJoinAppointment.appointmentName}" here:  farmassist://farmassist.app/appointment?id=`,
       text: `"${iJoinAppointment.appointmentName}"`,
-      link: iJoinAppointment.deeplink,
+      link: `${env.APP_BASEL_URL}/farmassist?link=farmassist://farmassist.app/appointment?id=`,
     };
 
     const template = await this.getEmailTemplate('join-appointment', payload);

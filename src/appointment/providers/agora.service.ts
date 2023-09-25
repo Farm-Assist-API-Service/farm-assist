@@ -79,7 +79,8 @@ class AgoraMeet {
     role: AgoraRoles,
   ): Promise<string> {
     const config = this.agoraService.appConfig;
-    let channelName = appointment.metaData.channelName;
+    let channelName = agoraPayloadDto.channelName;
+    // let channelName = appointment.metaData.channelName;
     const userRole = RtcRole[role];
     const currentDate = DateHelpers.addToDate(
       appointment.date,
@@ -89,7 +90,9 @@ class AgoraMeet {
 
     const uid = agoraPayloadDto.uid || 0;
     const privilegeExpiredTs = DateHelpers.getTimestamp(currentDate);
-    channelName = `${channelName}-${privilegeExpiredTs}`;
+    // channelName = `${channelName}-${privilegeExpiredTs}`;
+    console.log({channelName, userRole, uid});
+    
     return RtcTokenBuilder.buildTokenWithUid(
       config.appId,
       config.appCertificate,

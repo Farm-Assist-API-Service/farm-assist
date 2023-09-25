@@ -30,6 +30,8 @@ import { CreateAppointmentDto } from './dtos/create-appointment.dto';
 import { Appointment } from './entities/appointment.entity';
 import { Roles } from 'src/utils/decorators/roles.decorator';
 import { UserRoles } from 'src/core/enums/roles.enum';
+import { AgoraPayloadDto } from './dtos/agora-payload.dto';
+import { EStreamRoles } from './interfaces/appointment.service.interfaces';
 
 @Controller('api/appointments')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -88,11 +90,15 @@ export class AppointmentController {
   hostAppointment(
     @LoggedInProfile() host: ProfileInformation,
     @Param('appointmentId', ParseIntPipe) appointmentId: number,
+    @Body() agoraPayloadDto: AgoraPayloadDto,
   ) {
+    Object.assign(agoraPayloadDto, {
+      role: EStreamRoles.HOST,
+    });
     return this.appointmentService.generateAgoraToken(
+      agoraPayloadDto,
       host,
       appointmentId,
-      'HOST',
     );
   }
 
@@ -100,11 +106,15 @@ export class AppointmentController {
   joinAppointment(
     @LoggedInProfile() guest: ProfileInformation,
     @Param('appointmentId', ParseIntPipe) appointmentId: number,
+    @Body() agoraPayloadDto: AgoraPayloadDto,
   ) {
+    Object.assign(agoraPayloadDto, {
+      role: EStreamRoles.GUEST,
+    });
     return this.appointmentService.generateAgoraToken(
+      agoraPayloadDto,
       guest,
       appointmentId,
-      'GUEST',
     );
   }
 }

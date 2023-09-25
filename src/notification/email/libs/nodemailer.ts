@@ -19,7 +19,7 @@ import { Appointment } from 'src/appointment/entities/appointment.entity';
 import * as moment from 'moment';
 import { ProfileInformation } from 'src/user/profile-information/entities/profile-information.entity';
 import { ConfigService } from 'src/config/config.service';
-import { GenAppLinks } from 'src/appointment/interfaces/appointment.service.interfaces';
+import { GenAppLinks, IJoinAppointment } from 'src/appointment/interfaces/appointment.service.interfaces';
 import { AesEncryption } from 'src/utils/helpers/aes-encryption';
 import { EAppointmentActions } from 'src/appointment/enums/appointment-actions.enum';
 import { DateHelpers } from 'src/utils/helpers/date.helpers';
@@ -220,7 +220,7 @@ export class Nodemailer implements IEmailService {
   ): Promise<void> {
     // Mail host of acceptance
     console.log({ guest });
-    
+
     this.sendMail({
       from: env.APP_EMAIL,
       to: appointment.host.user.email,
@@ -272,6 +272,29 @@ export class Nodemailer implements IEmailService {
       to: env.APP_EMAIL,
       subject: inputs.subject,
       text: inputs.message,
+    });
+  }
+
+  async mailGuestsToJoinAppointment(
+    iJoinAppointment: IJoinAppointment,
+  ): Promise<void> {
+    const payload = {
+      subject: `${iJoinAppointment.host.firstName} started an appointment.`,
+      // text: `Join "${iJoinAppointment.appointmentName}" here:  farmassist://farmassist.app/appointment?id=`,
+      text: `"${iJoinAppointment.appointmentName}"`,
+      link: iJoinAppointment.deeplink,
+    };
+
+    const template = await this.getEmailTemplate('join-appointment', payload);
+
+     iJoinAppointment.guestsMail.forEach((email) => {
+      this.sendMail({
+        from: iJoinAppointment.host.email,
+        to: email,
+        subject: payload.subject,
+        text: payload.text,
+        html: template,
+      });
     });
   }
 }

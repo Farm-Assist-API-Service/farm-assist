@@ -26,6 +26,7 @@ import { ELocation } from 'src/core/enums/location.enum';
 import { EAgoraRoles } from './enums/providers.roles.enum';
 import {
   EStreamRoles,
+  IJoinAppointment,
   StreamRoles,
 } from './interfaces/appointment.service.interfaces';
 import { AgoraPayloadDto } from './dtos/agora-payload.dto';
@@ -337,11 +338,22 @@ export class AppointmentService implements Services {
           if (agoraPayloadDto.uid !== appointment.host.id) {
             throw new HttpException('Invalid host', HttpStatus.NOT_ACCEPTABLE);
           }
-          return this.agoraService.meet.generateToken(
+          const token = await this.agoraService.meet.generateToken(
             agoraPayloadDto,
             appointment,
             'PUBLISHER',
           );
+
+          const joinAppointment: Partial<IJoinAppointment> = {
+            appointmentName: appointment.title,
+            host: {
+              email: appointment.host.user.email,
+              firstName: appointment.host.user.firstName,
+            },
+            guestsMail: appointment.guests.map((guest) => guest.user.email),
+          };
+          this.eventEmitter.emit(AppointmentEvents.STARTED, joinAppointment);
+          return token;
         } else {
           const guest = appointment.guests.find(
             (g) => g.id === agoraPayloadDto.uid,

@@ -37,15 +37,24 @@ import { otpTemplate } from 'src/view/emails/otp';
 import { FarmAssistAppointmentProviders } from 'src/appointment/enums/appointment-providers.enum';
 import { FsService } from 'src/file/services/fs.service';
 import { GoogleService } from 'src/appointment/providers/google.service';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { EDeeplinkEvents } from 'src/core/enums/events/deep-link.events';
+import { OnEvent } from '@nestjs/event-emitter';
+import { PasswordHistory } from 'src/user/entities/password-history.entity';
+import { DateHelpers } from 'src/utils/helpers/date.helpers';
+import { IPasswordHistoryToken } from 'src/user/interfaces/password-history';
 
 export type Login = { email: string; phone?: string; password: string };
 
 @Injectable()
 export class AuthService {
+  private pswdResetRateLimit: number;
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
     @InjectRepository(ProfileInformation)
     private readonly profileRepo: Repository<ProfileInformation>,
+    @InjectRepository(PasswordHistory)
+    private readonly pwdsHistoryRepo: Repository<PasswordHistory>,
     // @InjectRepository(Region) private readonly regionRepo: Repository<Region>,
     // private readonly jwtService: JwtService,
     private readonly genService: GeneratorService,
@@ -56,7 +65,9 @@ export class AuthService {
     private readonly emailService: EmailEngineFactory,
     private readonly fsService: FsService,
     private readonly googleService: GoogleService,
-  ) {}
+  ) {
+    this.pswdResetRateLimit = 1;
+  }
 
   private getContactID(identifier: string): GetContactID {
     try {
@@ -291,35 +302,6 @@ export class AuthService {
   //   }
   // }
 
-  async resetUserPassword(payload: ResetPasswordDto): Promise<void> {
-    let user = await this.userRepo.findOne({
-      where: { email: payload.email },
-    });
-    if (!user) {
-      throw new HttpException('Invalid Email', HttpStatus.BAD_REQUEST);
-    }
-
-    // const otpResponse: SendOtpResponse = await this.smsService.sendOtp({
-    //   from: this.config.env.TWILIO_FROM_NUMBER,
-    //   to: user.profileInformation.phoneNumber,
-    //   messageText: `Use this pin to confirm your password reset - < 1234 >`,
-    // });
-
-    // generate OTP
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
-    user.otp = otp;
-    user = await this.userRepo.save(user);
-
-    // send user an OTP via sms
-    // await this.smsService.sendMessage({
-    //   body: `Use this One Time Password to complete your action - ${otp}`,
-    //   from: this.config.env.TWILIO_FROM_NUMBER,
-    //   to: user.profileInformation.phoneNumber,
-    // });
-
-    // await this.emailService.sendResetPasswordMail(user);
-  }
-
   async resetUserPasswordConfirm(
     payload: ResetPasswordConfirmDto,
   ): Promise<void> {
@@ -432,4 +414,88 @@ export class AuthService {
       });
     }
   }
+
+  private hasValidPwdToken(history: PasswordHistory[]): boolean {
+    if (!history.length) return false;
+    const now = new Date();
+    const result = history.map(({ token, createdAt }) => {
+      const expirationTime = DateHelpers.diffBtwDates('minute', createdAt, now);
+      console.log({
+        expirationTime,
+        pswdResetRateLimit: this.pswdResetRateLimit,
+        createdAt,
+        now,
+      });
+      
+      if (expirationTime >= this.pswdResetRateLimit) {
+        // console.log(`${token} =====> has expired`);
+        return true;
+      }
+      return false;
+    });
+    console.log({ result }, 'hasValidPwdToken');
+    return result[0];
+  }
+
+  async requestPasswordReset({ email }: ResetPasswordDto): Promise<void> {
+    let token = '';
+    const user = await this.userRepo.findOne({
+      where: { email },
+      relations: ['passwordHistory'],
+    });
+
+    if (!user) {
+      throw new HttpException('Invalid user', HttpStatus.OK);
+    }
+
+    const hasValidPwdToken = this.hasValidPwdToken(user.passwordHistory);
+    if (hasValidPwdToken) {
+    } else {
+      const pwdHsTokenPayload: IPasswordHistoryToken = {
+        email: user.email,
+        password: user.password,
+      };
+
+      token = this.genService.encryption.encrypt(
+        JSON.stringify(pwdHsTokenPayload),
+      );
+      
+      const newPwdHs = this.pwdsHistoryRepo.create({
+        user,
+        token,
+      });
+      await this.pwdsHistoryRepo.save(newPwdHs);
+    }
+
+    console.log({ hasValidPwdToken });
+    
+
+    await this.emailService
+      .findOne(EmailEngines.NODE_MAILER)
+      .sendResetPasswordMail(email, token);
+  }
+
+  @OnEvent(EDeeplinkEvents.OPEN_PASSWORD_RESET_SCREEN)
+  async validatePasswordResetToken(inputs: any) {
+    console.log({ inputs });
+  }
+
+  // @Cron(CronExpression.EVERY_HOUR)
+  // @Cron(CronExpression.EVERY_5_SECONDS)
+  // async revokePasswordReset(): Promise<void> {
+  //   const history = await this.pwdsHistoryRepo.find({
+  //     where: { valid: true },
+  //     relations: ['user']
+  //   });
+
+  //   console.log({ history });
+
+  // if (!history.length) return
+
+  // history.forEach(({ createdAt, user }) => {
+  //   // delete all passwordResetTokens created an hour ago
+  //   const isValid = DateHelpers.diffBtwDates('hour', new Date(), createdAt);
+  //   console.log(user.firstName, { isValid });
+  // });
+  // }
 }

@@ -83,12 +83,19 @@ export class AppointmentService implements Services {
       }
 
       inputs.guestIds.forEach((id) => {
+        if (profile.id === id) {
+          // todo: Make sure to restrict users from inviting themselves and other profiles tied to their account
+          throw new HttpException(
+            `Cannot add your profile as a guest`,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
         if (!profileIds.has(id)) {
-          const error = `Profile error: ${JSON.stringify(
+          throw new HttpException(`Profile error: ${JSON.stringify(
             `Could not find guest with the id: ${id}`,
-          )}`;
-          this.logger.error(error);
-          throw new HttpException(error, HttpStatus.BAD_REQUEST);
+            )}`,
+            HttpStatus.BAD_REQUEST,
+          );
         }
         // Exclude host
         if (profiles.find((each) => each.id === id).userId !== user.id) {

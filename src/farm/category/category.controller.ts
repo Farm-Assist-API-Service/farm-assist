@@ -23,7 +23,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { UserRoles } from 'src/core/enums/roles.enum';
 import { Roles } from 'src/utils/decorators/roles.decorator';
 
-@Controller('api/farm')
+@Controller('farm')
 @UseInterceptors(TransformInterceptor)
 @UseGuards(JwtAuthGuard, RolesGuard)
 @UseInterceptors(LoggingInterceptor)

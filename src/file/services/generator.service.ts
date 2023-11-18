@@ -17,6 +17,7 @@ import { TemplateEvents } from 'src/core/enums/events/template.events';
 import { ConfigService } from 'src/config/config.service';
 import { HandleHttpExceptions } from 'src/utils/helpers/handle-http-exceptions';
 import { SendMailPayload } from 'src/core/dtos/send-mail-payload';
+import { AesEncryption } from 'src/utils/helpers/aes-encryption';
 // import { Browser, PDFOptions, PaperFormat, Viewport } from 'puppeteer';
 
 // interface FileGeneratePayload {
@@ -35,10 +36,11 @@ export class GeneratorService {
 
   private readonly logger: Logger;
 
+  public encryption: AesEncryption;
+
   constructor(
     private readonly eventEmitter: EventEmitter2,
     private readonly configService: ConfigService,
-    // private readonly encryption: AesEncryption,
     private readonly fsService: FsService,
   ) {
     // @InjectBrowser() private readonly browser: Browser
@@ -46,6 +48,7 @@ export class GeneratorService {
     // this.encryption = new AesEncryption(
     //   this.configService.env.EMAIL_TRACKING_PRIVATE_KEY,
     // );
+    this.encryption = new AesEncryption(this.configService.env.RSA_PRIVATE_KEY);
   }
 
   get generateOTP(): string {

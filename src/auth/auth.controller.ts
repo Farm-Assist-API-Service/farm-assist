@@ -4,6 +4,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Patch,
   Post,
   Put,
   Query,
@@ -20,6 +21,7 @@ import { SignUpInput } from './dtos/sign-up.dto';
 import { VerifyAccountDto } from './dtos/verify-account.dto';
 import { Request } from 'express';
 import { FarmAssistAppointmentProviders } from 'src/appointment/enums/appointment-providers.enum';
+import { ResetPasswordDto } from './dtos/reset-password.dto';
 
 @Controller('auth')
 @UseInterceptors(TransformInterceptor)
@@ -46,7 +48,7 @@ export class AuthController {
   @Get('callback')
   callback(@Req() request: Request, @Query('code') code: string) {
     console.log({ code });
-    
+
     const provider = FarmAssistAppointmentProviders.GOOGLE_SERVICE;
     this.authService.oauthCallback(provider, code);
   }
@@ -65,4 +67,14 @@ export class AuthController {
       FarmAssistAppointmentProviders[provider],
     );
   }
+
+  @Patch('request-password-reset')
+  requestPasswordReset(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.requestPasswordReset(resetPasswordDto);
+  }
+
+  // @Patch('password-reset')
+  // requestPasswordReset(@Body() resetPasswordDto: ResetPasswordDto) {
+  //   return this.authService.requestPasswordReset(resetPasswordDto);
+  // }
 }

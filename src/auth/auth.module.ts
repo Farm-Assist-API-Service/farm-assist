@@ -18,11 +18,17 @@ import { ProfileInformation } from 'src/user/profile-information/entities/profil
 import { EmailModule } from 'src/notification/email/email.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { GoogleService } from 'src/appointment/providers/google.service';
+import { PasswordHistory } from 'src/user/entities/password-history.entity';
 
 @Module({
   imports: [
     EventEmitterModule.forRoot(),
-    TypeOrmModule.forFeature([User, Region, ProfileInformation]),
+    TypeOrmModule.forFeature([
+      User,
+      Region,
+      ProfileInformation,
+      PasswordHistory,
+    ]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

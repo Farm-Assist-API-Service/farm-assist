@@ -38,6 +38,7 @@ export interface IFailedOauthTokenMail {
 export interface IEmailService {
   sendMail(inputs: MailOptions): Promise<void>;
   sendOTPMail(user: User): Promise<void>;
+  sendResetPasswordMail(email: string, resetPasswordUrl: string): Promise<void>;
   sendAppointmentMail(appointment: Appointment): Promise<void>;
   sendAppointmentCancellationMail(appointment: Appointment): Promise<void>;
   sendAppointmentAcceptanceMail(

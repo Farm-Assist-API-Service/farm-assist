@@ -1,6 +1,5 @@
 import * as moment from 'moment';
 
-type U = 'days' | 'weeks' | 'years';
 type NumStr = number | string;
 
 export const DEFAULT_DATE_FORMAT = 'DD/MM/YYYY';
@@ -8,10 +7,12 @@ export const YEAR_MONTH_DAY_DATE_FORMAT = 'YYYY-MM-DD';
 // export const YEAR_MONTH_DAY_DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:MM:SS';
 export const HOUR_MIN_SEC_TIME_FORMAT = 'HH:mm:ss';
 export const DAY_MONTH_DATE_YEAR_TIME_FORMAT = 'LLLL';
+export const YEAR_FORMAT = 'YYYY';
 
 export type Format =
   | typeof DEFAULT_DATE_FORMAT
   | typeof YEAR_MONTH_DAY_DATE_FORMAT
+  | typeof YEAR_FORMAT
   | typeof HOUR_MIN_SEC_TIME_FORMAT;
 
 export class DateHelpers {
@@ -28,7 +29,7 @@ export class DateHelpers {
   }
 
   static diffBtwDates(
-    unit: U,
+    unit: moment.unitOfTime.Diff,
     date1: Date | string,
     date2?: Date | string,
   ): number {

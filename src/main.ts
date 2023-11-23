@@ -13,6 +13,10 @@ async function bootstrap() {
     }),
   );
 
+  app.setGlobalPrefix('api/v1/', {
+    exclude: ['health', 'auth/signup', 'auth/signin'],
+  });
+
   app.enableCors();
   // app.use(helmet());
   // if (config.env.NODE_ENV === 'development' || config.env.NODE_ENV === 'test') {

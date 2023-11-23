@@ -20,6 +20,7 @@ import {
   VersionColumn,
 } from 'typeorm';
 import { ProfileInformation } from './profile-information/entities/profile-information.entity';
+import { PasswordHistory } from './entities/password-history.entity';
 
 @Entity()
 export class User {
@@ -89,6 +90,10 @@ export class User {
 
   @Column({ default: UserSource.DEV_ENV })
   source: UserSource;
+
+  @OneToMany(() => PasswordHistory, (pwdR) => pwdR.user)
+  @JoinColumn()
+  passwordHistory: PasswordHistory[];
 
   // @OneToOne(() => Kyc, (kyc) => kyc.user, {
   //   onDelete: 'SET NULL',

@@ -297,4 +297,8 @@ export class Nodemailer implements IEmailService {
       });
     });
   }
+
+  async sendResetPasswordMail(email: string, resetPasswordUrl: string): Promise<void> {
+    //
+  }
 }

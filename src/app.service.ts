@@ -1,9 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, Res } from '@nestjs/common';
 import { Connection } from 'typeorm';
+import { Response } from 'express';
 
 @Injectable()
 export class AppService {
-  constructor(private readonly connection: Connection) {}
+  private logger: Logger;
+  constructor(private readonly connection: Connection) {
+    this.logger = new Logger(AppService.name);
+  }
   getHealthStatus(): any {
     const isConnected = this.connection.isInitialized;
     return {

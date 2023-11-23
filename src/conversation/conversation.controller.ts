@@ -13,7 +13,7 @@ import { UserRoles } from 'src/core/enums/roles.enum';
 import { Roles } from 'src/utils/decorators/roles.decorator';
 import { HttpExceptionFilter } from 'src/utils/filters/http-exception.filter';
 
-@Controller('api/conversations')
+@Controller('conversations')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @UseInterceptors(TransformInterceptor)
 @UseInterceptors(LoggingInterceptor)

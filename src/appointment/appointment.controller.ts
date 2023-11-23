@@ -33,7 +33,7 @@ import { UserRoles } from 'src/core/enums/roles.enum';
 import { AgoraPayloadDto } from './dtos/agora-payload.dto';
 import { EStreamRoles } from './interfaces/appointment.service.interfaces';
 
-@Controller('api/appointments')
+@Controller('appointments')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @UseInterceptors(TransformInterceptor)
 @UseInterceptors(LoggingInterceptor)

@@ -8,12 +8,12 @@ import {
 import { config } from 'dotenv';
 import { plainToClass } from 'class-transformer';
 
-type NODE_ENV = 'development' | 'production' | 'test';
+type NODE_ENV = 'development' | 'production' | 'test' | 'staging';
 type MAIL_PROVIDERS = 'gmail';
 type TYPEORM_TYPE = 'auto' | 'sqlite' | 'postgres';
 
 class EnvConfig {
-  @IsIn(['development', 'production', 'test'])
+  @IsIn(['development', 'production', 'test', 'staging'])
   NODE_ENV: NODE_ENV;
 
   @IsString()
@@ -98,8 +98,9 @@ class EnvConfig {
   @IsString()
   APP_BASEL_URL: string;
 
-  @IsIn(['gmail'])
-  NODE_MAILER_SERVICE_PROVIDER: MAIL_PROVIDERS;
+  // @IsIn(['gmail'])
+  NODE_MAILER_SERVICE_PROVIDER: string;
+  // NODE_MAILER_SERVICE_PROVIDER: MAIL_PROVIDERS;
 
   @IsString()
   RSA_PRIVATE_KEY: string;
@@ -124,9 +125,9 @@ class EnvConfig {
     obj.NODE_ENV = 'development';
     obj.APP_EMAIL = process.env.APP_EMAIL || 'farmassite@gmail.com';
     obj.APP_NAME = process.env.APP_NAME || 'Farm Assist';
-    obj.APP_BASEL_URL =
-      process.env.APP_BASEL_URL || 'https://farm-assist-staging.up.railway.app';
     obj.PORT = 3000;
+    obj.APP_BASEL_URL =
+      process.env.APP_BASEL_URL || 'https://localhost:' + obj.PORT;
     obj.TYPEORM_TYPE = (process.env.TYPEORM_TYPE as TYPEORM_TYPE) || 'auto';
     obj.TYPEORM_HOST = process.env.TYPEORM_HOST || 'localhost';
     obj.TYPEORM_USERNAME = process.env.TYPEORM_USERNAME || 'gu';

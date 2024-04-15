@@ -25,7 +25,7 @@ export class UserService {
       });
       return this.userRepo.save(newUser);
     } catch (error) {
-      new HandleHttpExceptions({
+      throw new HandleHttpExceptions({
         error,
         source: {
           service: UserService.name,
@@ -40,7 +40,7 @@ export class UserService {
     try {
       return this.userRepo.findOne(inputs);
     } catch (error) {
-      new HandleHttpExceptions({
+      throw new HandleHttpExceptions({
         error,
         source: {
           service: UserService.name,
@@ -55,7 +55,7 @@ export class UserService {
     try {
       return this.userRepo.find(input);
     } catch (error) {
-      new HandleHttpExceptions({
+      throw new HandleHttpExceptions({
         error,
         source: {
           service: UserService.name,
@@ -129,7 +129,7 @@ export class UserService {
         availability: !data,
       };
     } catch (error) {
-      new HandleHttpExceptions({
+      throw new HandleHttpExceptions({
         error,
         source: {
           service: UserService.name,

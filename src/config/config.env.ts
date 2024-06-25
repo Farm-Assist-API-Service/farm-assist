@@ -132,12 +132,10 @@ class EnvConfig {
     obj.TYPEORM_HOST =
       process.env.TYPEORM_HOST ||
       'dpg-cpthua5ds78s73dvmt10-a.oregon-postgres.render.com';
-    obj.TYPEORM_USERNAME =
-      process.env.TYPEORM_USERNAME || 'farm_assist_hrzr_user';
-    obj.TYPEORM_PASSWORD =
-      process.env.TYPEORM_PASSWORD || 'mLfSX9oKbuAV4Hob5EyBlvdcsRGdty6B';
-    obj.TYPEORM_DATABASE = process.env.TYPEORM_DATABASE || 'farm_assist_hrzr';
-    obj.TYPEORM_PORT = +process.env.TYPEORM_PORT || 5432;
+    obj.TYPEORM_USERNAME ='farm_assist_hrzr_user';
+    obj.TYPEORM_PASSWORD = 'mLfSX9oKbuAV4Hob5EyBlvdcsRGdty6B';
+    obj.TYPEORM_DATABASE = 'farm_assist_hrzr';
+    obj.TYPEORM_PORT = 5432;
     obj.TYPEORM_LOGGING = true;
     obj.HEALTH_CHECK_DATABASE_TIMEOUT_MS = 3000;
     obj.JWT_SECRET = 'farm-assist-jwt-secret';

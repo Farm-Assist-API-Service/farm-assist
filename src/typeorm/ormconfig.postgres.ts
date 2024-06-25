@@ -19,7 +19,8 @@ export const dataSourceOptions: DataSourceOptions = {
   // autoLoadEntities: true,
   // synchronize: true,
   logging: env.TYPEORM_LOGGING,
-  ssl: !['test', 'development'].includes(env.NODE_ENV),
+  // ssl: !['test', 'development'].includes(env.NODE_ENV),
+  ssl: true,
   migrationsTableName: 'migrations',
 };
 

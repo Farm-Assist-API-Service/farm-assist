@@ -7,13 +7,10 @@ import {
 } from 'class-validator';
 import { config } from 'dotenv';
 import { plainToClass } from 'class-transformer';
-import core = require('@actions/core');
 
 type NODE_ENV = 'development' | 'production' | 'test' | 'staging';
 type MAIL_PROVIDERS = 'gmail';
 type TYPEORM_TYPE = 'auto' | 'sqlite' | 'postgres';
-
-console.log('PORT', core.getInput('PORT'));
 
 class EnvConfig {
   @IsIn(['development', 'production', 'test', 'staging'])
@@ -132,10 +129,14 @@ class EnvConfig {
     obj.APP_BASEL_URL =
       process.env.APP_BASEL_URL || 'https://localhost:' + obj.PORT;
     obj.TYPEORM_TYPE = (process.env.TYPEORM_TYPE as TYPEORM_TYPE) || 'auto';
-    obj.TYPEORM_HOST = process.env.TYPEORM_HOST || 'localhost';
-    obj.TYPEORM_USERNAME = process.env.TYPEORM_USERNAME || 'gu';
-    obj.TYPEORM_PASSWORD = process.env.TYPEORM_PASSWORD || 'postgres';
-    obj.TYPEORM_DATABASE = process.env.TYPEORM_DATABASE || 'farm_assist';
+    obj.TYPEORM_HOST =
+      process.env.TYPEORM_HOST ||
+      'dpg-cpthua5ds78s73dvmt10-a.oregon-postgres.render.com';
+    obj.TYPEORM_USERNAME =
+      process.env.TYPEORM_USERNAME || 'farm_assist_hrzr_user';
+    obj.TYPEORM_PASSWORD =
+      process.env.TYPEORM_PASSWORD || 'mLfSX9oKbuAV4Hob5EyBlvdcsRGdty6B';
+    obj.TYPEORM_DATABASE = process.env.TYPEORM_DATABASE || 'farm_assist_hrzr';
     obj.TYPEORM_PORT = +process.env.TYPEORM_PORT || 5432;
     obj.TYPEORM_LOGGING = true;
     obj.HEALTH_CHECK_DATABASE_TIMEOUT_MS = 3000;
@@ -152,8 +153,10 @@ class EnvConfig {
     obj.FIREBASE_STORAGE_BUCKET = '';
     obj.USE_OTP_VERIFICATION = !!process.env.USE_OTP_VERIFICATION || true;
     obj.SKIP_AUTH = !!process.env.SKIP_AUTH || false;
-    obj.NODE_MAILER_AUTH_USER = process.env.NODE_MAILER_AUTH_USER;
-    obj.NODE_MAILER_AUTH_PASS = process.env.NODE_MAILER_AUTH_PASS;
+    obj.NODE_MAILER_AUTH_USER =
+      process.env.NODE_MAILER_AUTH_USER || 'farmassite@gmail.com';
+    obj.NODE_MAILER_AUTH_PASS =
+      process.env.NODE_MAILER_AUTH_PASS || 'cwxpwmbfnxbihnnv';
     obj.NODE_MAILER_SERVICE_PROVIDER =
       (process.env.NODE_MAILER_SERVICE_PROVIDER as MAIL_PROVIDERS) || 'gmail';
     obj.RSA_PRIVATE_KEY = `-----BEGIN OPENSSH PRIVATE KEY-----
@@ -206,11 +209,18 @@ xRVl/Ml6rIgy7fqQTi9Zxs6/Wv/8PCtDmry4z3zd0j+MbN/rZ7Tbmt9LfjRp0+KCA7VjLa
 T9rxZzYTq2MAAAAPZ3VAZXRhcC0wNXMtTUJQAQIDBA==
 -----END OPENSSH PRIVATE KEY-----
 `;
-    obj.GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-    obj.GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-    obj.GOOGLE_CLIENT_REDIRECT_URL = process.env.GOOGLE_CLIENT_REDIRECT_URL;
-    obj.AGORA_APP_ID = process.env.AGORA_APP_ID;
-    obj.AGORA_APP_CERTIFICATE = process.env.AGORA_APP_CERTIFICATE;
+    obj.GOOGLE_CLIENT_ID =
+      process.env.GOOGLE_CLIENT_ID ||
+      '191986046277-hi4u7dq4g1qun73djliaa2ge5rv10uqv.apps.googleusercontent.com';
+    obj.GOOGLE_CLIENT_SECRET =
+      process.env.GOOGLE_CLIENT_SECRET || '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';
+    obj.GOOGLE_CLIENT_REDIRECT_URL =
+      process.env.GOOGLE_CLIENT_REDIRECT_URL ||
+      'http://localhost:3000/auth/callback';
+    obj.AGORA_APP_ID =
+      process.env.AGORA_APP_ID || 'a89d7c2dc59849ceb7ae86c9dc2c45f0';
+    obj.AGORA_APP_CERTIFICATE =
+      process.env.AGORA_APP_CERTIFICATE || '81a8d4aafb7d4858845d0ed630e40a51';
 
     return obj;
   }

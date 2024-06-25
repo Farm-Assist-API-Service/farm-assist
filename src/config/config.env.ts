@@ -7,10 +7,13 @@ import {
 } from 'class-validator';
 import { config } from 'dotenv';
 import { plainToClass } from 'class-transformer';
+import core = require('@actions/core');
 
 type NODE_ENV = 'development' | 'production' | 'test' | 'staging';
 type MAIL_PROVIDERS = 'gmail';
 type TYPEORM_TYPE = 'auto' | 'sqlite' | 'postgres';
+
+console.log('PORT', core.getInput('PORT'));
 
 class EnvConfig {
   @IsIn(['development', 'production', 'test', 'staging'])

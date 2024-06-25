@@ -1,0 +1,30 @@
+name: Ngrok Porting
+
+on:
+  push:
+    branches: [ "ngrok_porting" ]
+  pull_request:
+    branches: [ "ngrok_porting" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: ['20']
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    # - run: sudo apt update
+    # - run: sudo apt install wget
+    # - run: wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+    # - run: unzip ngrok-stable-linux-amd64.zip
+    # - run: ls ngrok-stable-linux-amd64
+    - run: npm i
+    - run: npm run start

@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
+import ngrok = require('@ngrok/ngrok');
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -54,8 +55,16 @@ async function bootstrap() {
   //  });
 
   const PORT = +process.env.PORT || 3000;
-  await app.listen(PORT);
+  await app.listen(PORT, () => {
+    console.log('Server started on port: ' + PORT);
+    useNgrok(PORT);
+  });
+}
 
-  console.log('Server started on port: ' + PORT);
+export default async function useNgrok(PORT: number) {
+  const authtoken = '2iNYAsvLDDEdfou5XtVPx11ViuX_2GN1hMdo3hV4tTeLroKXL';
+  const domain = 'kingfish-stirring-amazingly.ngrok-free.app';
+  const listener = await ngrok.forward({ addr: PORT, authtoken });
+  console.log(`Ingress established at: ${listener.url()}`);
 }
 bootstrap();

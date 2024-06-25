@@ -37,6 +37,7 @@
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/schedule": "^3.0.3",
     "@nestjs/typeorm": "^9.0.1",
+    "@ngrok/ngrok": "^1.3.0",
     "agora-access-token": "^2.0.4",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",

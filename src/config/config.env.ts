@@ -242,7 +242,7 @@ if (errors.length > 0) {
   throw new Error('Invalid env.');
 }
 
-console.log({env});
+console.log({env}); 
 
 
 export { EnvConfig, env };

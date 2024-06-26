@@ -241,7 +241,9 @@ if (errors.length > 0) {
   throw new Error('Invalid env.');
 }
 
-new Logger(EnvConfig.name).log(env); 
+new Logger(EnvConfig.name).log(env);
+console.log({env});
+ 
 
 
 export { EnvConfig, env };

@@ -10,10 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: ['20']
-
     steps:
     - uses: actions/checkout@v4
     - name: Use Node.js ${{ matrix.node-version }}
@@ -26,5 +22,6 @@ jobs:
     # - run: wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
     # - run: unzip ngrok-stable-linux-amd64.zip
     # - run: ls ngrok-stable-linux-amd64
+    - run: echo "SSH_HOST ${{secrets.SSH_HOST}}" 
     - run: npm i
     - run: npm run start

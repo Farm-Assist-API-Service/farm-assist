@@ -7,6 +7,7 @@ import {
 } from 'class-validator';
 import { config } from 'dotenv';
 import { plainToClass } from 'class-transformer';
+import { Logger } from '@nestjs/common';
 
 type NODE_ENV = 'development' | 'production' | 'test' | 'staging';
 type MAIL_PROVIDERS = 'gmail';
@@ -240,7 +241,7 @@ if (errors.length > 0) {
   throw new Error('Invalid env.');
 }
 
-console.log({env}); 
+new Logger(EnvConfig.name).log(env); 
 
 
 export { EnvConfig, env };
